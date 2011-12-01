@@ -1,0 +1,12 @@
+diff -up mailman-2.1.12/messages/fr/LC_MESSAGES/mailman.po.codage mailman-2.1.12/messages/fr/LC_MESSAGES/mailman.po
+--- mailman-2.1.12/messages/fr/LC_MESSAGES/mailman.po.codage	2009-10-13 13:29:59.000000000 +0200
++++ mailman-2.1.12/messages/fr/LC_MESSAGES/mailman.po	2009-10-13 13:30:35.000000000 +0200
+@@ -9445,7 +9445,7 @@ msgid ""
+ "## captured on %(when)s\n"
+ msgstr ""
+ "# -*- python -*-\n"
+-"# -*- codage : %(charset)s -*-\n"
++"# -*- coding: %(charset)s -*-\n"
+ "## Paramètres de configuration de la liste \"%(listname)s\"\n"
+ "## Capturé le %(when)s\n"
+ 

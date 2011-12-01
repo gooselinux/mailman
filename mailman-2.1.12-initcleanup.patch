@@ -1,0 +1,65 @@
+diff -up mailman-2.1.12/misc/mailman.in.initcleanup mailman-2.1.12/misc/mailman.in
+--- mailman-2.1.12/misc/mailman.in.initcleanup	2009-10-05 09:09:35.000000000 -0400
++++ mailman-2.1.12/misc/mailman.in	2009-10-05 17:53:56.000000000 -0400
+@@ -91,6 +91,8 @@ function start()
+     then
+ 	touch /var/lock/subsys/$prog
+ 	InstallCron
++    else
++        RETVAL=6	
+     fi
+     echo
+     return $RETVAL
+@@ -98,6 +100,8 @@ function start()
+ 
+ function stop()
+ {
++    if [ -f /var/lock/subsys/$prog ]
++    then
+     echo -n $"Shutting down $prog: "
+     mailman-update-cfg
+     daemon $MAILMANCTL -q stop
+@@ -108,6 +112,10 @@ function stop()
+ 	RemoveCron
+     fi
+     echo
++    else
++    echo $"$prog already stopped."
++    RETVAL=0
++    fi
+     return $RETVAL
+ }
+ 
+@@ -135,7 +143,7 @@ case "$1" in
+     RETVAL=$?
+     ;;
+ 
+-'condrestart')
++'condrestart'|'try-restart')
+     $MAILMANCTL -q -u status
+     retval=$?
+     if [ $retval -eq 0 ]
+@@ -146,13 +154,20 @@ case "$1" in
+     ;;
+ 
+ 'status')
+-    $MAILMANCTL -u status
++    output=$($MAILMANCTL -u status)
+     RETVAL=$?
++    if [ $RETVAL -eq 3 -a -f /var/lock/subsys/$prog ]
++    then
++        echo $"$prog dead but subsys locked"
++        RETVAL=2
++    else
++        echo $output
++    fi
+     ;;
+ 
+ *)
+-    echo $"Usage: $prog {start|stop|restart|force-reload|condrestart|status}"
+-    RETVAL=3
++    echo $"Usage: $prog {start|stop|restart|force-reload|condrestart|try-restart|status}"
++    RETVAL=2
+     ;;
+ 
+ esac

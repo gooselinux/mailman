@@ -1,0 +1,102 @@
+diff -ruN mailman-2.1.12-a/bin/change_pw mailman-2.1.12-b/bin/change_pw
+--- mailman-2.1.12-a/bin/change_pw	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/change_pw	2009-07-28 12:19:50.000000000 +0200
+@@ -186,8 +186,8 @@
+                 adminurl = mlist.GetScriptURL('admin', absolute=1)
+                 msg = Message.UserNotification(
+                     mlist.owner[:], Utils.get_site_email(),
+-                    _('Your new %(listname)s list password'),
+-                    _('''\
++                    C_('Your new %(listname)s list password'),
++                    C_('''\
+ The site administrator at %(hostname)s has changed the password for your
+ mailing list %(listname)s.  It is now
+ 
+diff -ruN mailman-2.1.12-a/bin/check_perms mailman-2.1.12-b/bin/check_perms
+--- mailman-2.1.12-a/bin/check_perms	2009-07-28 12:19:49.000000000 +0200
++++ mailman-2.1.12-b/bin/check_perms	2009-07-28 12:19:50.000000000 +0200
+@@ -221,7 +221,7 @@
+     # In addition, on a multiuser system you may want to hide the private
+     # archives so other users can't read them.
+     if mode & S_IXOTH:
+-        print _("""\
++        print C_("""\
+ Warning: Private archive directory is other-executable (o+x).
+          This could allow other users on your system to read private archives.
+          If you're on a shared multiuser system, you should consult the
+diff -ruN mailman-2.1.12-a/bin/newlist mailman-2.1.12-b/bin/newlist
+--- mailman-2.1.12-a/bin/newlist	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/newlist	2009-07-28 12:19:50.000000000 +0200
+@@ -246,7 +246,7 @@
+         try:
+             msg = Message.UserNotification(
+                 owner_mail, siteowner,
+-                _('Your new mailing list: %(listname)s'),
++                C_('Your new mailing list: %(listname)s'),
+                 text, mlist.preferred_language)
+             msg.send(mlist)
+         finally:
+diff -ruN mailman-2.1.12-a/bin/reset_pw.py mailman-2.1.12-b/bin/reset_pw.py
+--- mailman-2.1.12-a/bin/reset_pw.py	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/reset_pw.py	2009-07-28 12:19:50.000000000 +0200
+@@ -38,7 +38,7 @@
+ 
+ import paths
+ from Mailman import Utils
+-from Mailman.i18n import _
++from Mailman.i18n import _C
+ 
+ 
+ try:
+@@ -74,13 +74,13 @@
+ 
+     listname = mlist.internal_name()
+     if verbose:
+-        print _('Changing passwords for list: %(listname)s')
++        print C_('Changing passwords for list: %(listname)s')
+ 
+     for member in mlist.getMembers():
+         randompw = Utils.MakeRandomPassword()
+         mlist.setMemberPassword(member, randompw)
+         if verbose:
+-            print _('New password for member %(member)40s: %(randompw)s')
++            print C_('New password for member %(member)40s: %(randompw)s')
+ 
+     mlist.Save()
+ 
+diff -ruN mailman-2.1.12-a/bin/update mailman-2.1.12-b/bin/update
+--- mailman-2.1.12-a/bin/update	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/update	2009-07-28 12:19:50.000000000 +0200
+@@ -455,7 +455,7 @@
+         except EnvironmentError, e:
+             if e.errno <> errno.ENOTDIR:
+                 raise
+-            print _('Warning!  Not a directory: %(dirpath)s')
++            print C_('Warning!  Not a directory: %(dirpath)s')
+ 
+ 
+ 
+@@ -538,7 +538,7 @@
+                 msg = data = None
+         except EOFError:
+             # For some reason the pckfile was empty.  Just delete it.
+-            print _('Warning!  Deleting empty .pck file: %(pckfile)s')
++            print C_('Warning!  Deleting empty .pck file: %(pckfile)s')
+             os.unlink(pckfile)
+     finally:
+         if msgfp:
+diff -ruN mailman-2.1.12-a/Mailman/MTA/Postfix.py mailman-2.1.12-b/Mailman/MTA/Postfix.py
+--- mailman-2.1.12-a/Mailman/MTA/Postfix.py	2009-07-28 12:19:49.000000000 +0200
++++ mailman-2.1.12-b/Mailman/MTA/Postfix.py	2009-07-28 12:19:50.000000000 +0200
+@@ -356,9 +356,9 @@
+         if stat and (stat[ST_MODE] & targetmode) <> targetmode:
+             state.ERRORS += 1
+             octmode = oct(stat[ST_MODE])
+-            print _('%(dbfile)s permissions must be 066x (got %(octmode)s)'),
++            print C_('%(dbfile)s permissions must be 066x (got %(octmode)s)'),
+             if state.FIX:
+-                print _('(fixing)')
++                print C_('(fixing)')
+                 os.chmod(dbfile, stat[ST_MODE] | targetmode)
+             else:
+                 print

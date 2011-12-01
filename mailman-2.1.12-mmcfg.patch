@@ -1,0 +1,19 @@
+diff -ruN mailman-2.1.12-a/misc/mailman.in mailman-2.1.12-b/misc/mailman.in
+--- mailman-2.1.12-a/misc/mailman.in	2009-07-28 12:19:53.000000000 +0200
++++ mailman-2.1.12-b/misc/mailman.in	2009-07-28 12:19:55.000000000 +0200
+@@ -84,6 +84,7 @@
+ function start()
+ {
+     echo -n $"Starting $prog: "
++    mailman-update-cfg
+     daemon $MAILMANCTL -s -q start
+     RETVAL=$?
+     if [ $RETVAL -eq 0 ]
+@@ -98,6 +99,7 @@
+ function stop()
+ {
+     echo -n $"Shutting down $prog: "
++    mailman-update-cfg
+     daemon $MAILMANCTL -q stop
+     RETVAL=$?
+     if [ $RETVAL -eq 0 ]

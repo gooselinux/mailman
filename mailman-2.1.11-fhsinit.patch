@@ -1,0 +1,39 @@
+diff -ruN mailman-2.1.12-a/misc/mailman.in mailman-2.1.12-b/misc/mailman.in
+--- mailman-2.1.12-a/misc/mailman.in	2009-07-28 12:19:53.000000000 +0200
++++ mailman-2.1.12-b/misc/mailman.in	2009-07-28 12:19:53.000000000 +0200
+@@ -31,6 +31,16 @@
+ # processname: mailmanctl
+ # config: @prefix@/Mailman/mm_cfg.py
+ # pidfile: @PID_DIR@/master-qrunner.pid
++### BEGIN INIT INFO
++# Provides: mailman
++# Required-Start: $local_fs $remote_fs $network $named
++# Should-Start: httpd
++# Required-Stop: $local_fs $remote_fs $network
++# Default-Start: 3 4 5
++# Default-Stop: 0 1 6
++# Short-Description: start and stop Mailman
++# Description: Mailman is the GNU mailing list manager.
++### END INIT INFO
+ 
+ MAILMANHOME=@prefix@
+ MAILMANCTL=$MAILMANHOME/bin/mailmanctl
+@@ -118,7 +128,7 @@
+     RETVAL=$?
+     ;;
+ 
+-'restart')
++'restart'|'force-reload')
+     restart
+     RETVAL=$?
+     ;;
+@@ -139,7 +149,8 @@
+     ;;
+ 
+ *)
+-    echo $"Usage: $prog {start|stop|restart|condrestart|status}"
++    echo $"Usage: $prog {start|stop|restart|force-reload|condrestart|status}"
++    RETVAL=3
+     ;;
+ 
+ esac

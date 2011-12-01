@@ -1,0 +1,50 @@
+diff --git a/Mailman/Archiver/pipermail.py b/Mailman/Archiver/pipermail.py
+index 49de805..da582d2 100644
+--- a/Mailman/Archiver/pipermail.py
++++ b/Mailman/Archiver/pipermail.py
+@@ -1,4 +1,4 @@
+-#! /usr/bin/env python
++#! /usr/bin/python
+ 
+ from __future__ import nested_scopes
+ 
+diff --git a/Mailman/Post.py b/Mailman/Post.py
+index 5b7af77..63edd38 100644
+--- a/Mailman/Post.py
++++ b/Mailman/Post.py
+@@ -1,4 +1,4 @@
+-#! /usr/bin/env python
++#! /usr/bin/python
+ #
+ # Copyright (C) 2001,2002 by the Free Software Foundation, Inc.
+ #
+diff --git a/bin/msgfmt.py b/bin/msgfmt.py
+index 8a2d4e6..277901c 100755
+--- a/bin/msgfmt.py
++++ b/bin/msgfmt.py
+@@ -1,4 +1,4 @@
+-#! /usr/bin/env python
++#! /usr/bin/python
+ # -*- coding: iso-8859-1 -*-
+ # Written by Martin v. Löwis <loewis@informatik.hu-berlin.de>
+ 
+diff --git a/tests/fblast.py b/tests/fblast.py
+index 092e420..67904f4 100644
+--- a/tests/fblast.py
++++ b/tests/fblast.py
+@@ -1,4 +1,4 @@
+-#! /usr/bin/env python
++#! /usr/bin/python
+ """Throw email at Mailman as fast as you can.
+ 
+ This is not a unit test, it's a functional test, so you can't run it within
+diff --git a/tests/onebounce.py b/tests/onebounce.py
+index 2b05807..cc9296a 100755
+--- a/tests/onebounce.py
++++ b/tests/onebounce.py
+@@ -1,4 +1,4 @@
+-#! /usr/bin/env python
++#! /usr/bin/python
+ 
+ # Copyright (C) 2002 by the Free Software Foundation, Inc.
+ #

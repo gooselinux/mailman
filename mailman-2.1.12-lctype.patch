@@ -1,0 +1,2503 @@
+diff -ruN mailman-2.1.12-a/bin/add_members mailman-2.1.12-b/bin/add_members
+--- mailman-2.1.12-a/bin/add_members	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/add_members	2009-07-28 12:19:54.000000000 +0200
+@@ -80,7 +80,7 @@
+ from Mailman import mm_cfg
+ from Mailman import i18n
+ 
+-_ = i18n._
++C_ = i18n.C_
+ 
+ 
+ 
+@@ -89,7 +89,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(status)
+@@ -134,19 +134,19 @@
+         try:
+             mlist.ApprovedAddMember(userdesc, ack, 0)
+         except Errors.MMAlreadyAMember:
+-            print >> tee, _('Already a member: %(member)s')
++            print >> tee, C_('Already a member: %(member)s')
+         except Errors.MembershipIsBanned, pattern:
+             print >> tee, ('%s:' %
+-                           member), _('Banned address (matched %(pattern)s)')
++                           member), C_('Banned address (matched %(pattern)s)')
+         except Errors.MMBadEmailError:
+             if userdesc.address == '':
+-                print >> tee, _('Bad/Invalid email address: blank line')
++                print >> tee, C_('Bad/Invalid email address: blank line')
+             else:
+-                print >> tee, _('Bad/Invalid email address: %(member)s')
++                print >> tee, C_('Bad/Invalid email address: %(member)s')
+         except Errors.MMHostileAddress:
+-            print >> tee, _('Hostile address (illegal characters): %(member)s')
++            print >> tee, C_('Hostile address (illegal characters): %(member)s')
+         else:
+-            print >> tee, _('Subscribed: %(member)s')
++            print >> tee, C_('Subscribed: %(member)s')
+ 
+ 
+ 
+@@ -191,26 +191,26 @@
+             elif arg.lower()[0] == 'n':
+                 send_welcome_msg = 0
+             else:
+-                usage(1, _('Bad argument to -w/--welcome-msg: %(arg)s'))
++                usage(1, C_('Bad argument to -w/--welcome-msg: %(arg)s'))
+         elif opt in ('-a', '--admin-notify'):
+             if arg.lower()[0] == 'y':
+                 admin_notif = 1
+             elif arg.lower()[0] == 'n':
+                 admin_notif = 0
+             else:
+-                usage(1, _('Bad argument to -a/--admin-notify: %(arg)s'))
++                usage(1, C_('Bad argument to -a/--admin-notify: %(arg)s'))
+ 
+     if dfile is None and nfile is None:
+         usage(1)
+ 
+     if dfile == "-" and nfile == "-":
+-        usage(1, _('Cannot read both digest and normal members '
++        usage(1, C_('Cannot read both digest and normal members '
+                    'from standard input.'))
+ 
+     try:
+         mlist = MailList.MailList(listname)
+     except Errors.MMUnknownListError:
+-        usage(1, _('No such list: %(listname)s'))
++        usage(1, C_('No such list: %(listname)s'))
+ 
+     # Set up defaults
+     if send_welcome_msg is None:
+@@ -230,7 +230,7 @@
+             nmembers = readfile(nfile)
+ 
+         if not dmembers and not nmembers:
+-            usage(0, _('Nothing to do.'))
++            usage(0, C_('Nothing to do.'))
+ 
+         s = StringIO()
+         i18n.set_language(mlist.preferred_language)
+@@ -242,7 +242,7 @@
+ 
+         if admin_notif:
+             realname = mlist.real_name
+-            subject = _('%(realname)s subscription notification')
++            subject = C_('%(realname)s subscription notification')
+             msg = Message.UserNotification(
+                 mlist.owner, Utils.get_site_email(), subject, s.getvalue(),
+                 mlist.preferred_language)
+diff -ruN mailman-2.1.12-a/bin/arch mailman-2.1.12-b/bin/arch
+--- mailman-2.1.12-a/bin/arch	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/arch	2009-07-28 12:19:54.000000000 +0200
+@@ -70,7 +70,7 @@
+ from Mailman.LockFile import LockFile
+ from Mailman import i18n
+ 
+-_ = i18n._
++C_ = i18n.C_
+ 
+ PROGRAM = sys.argv[0]
+ i18n.set_language(mm_cfg.DEFAULT_SERVER_LANGUAGE)
+@@ -82,7 +82,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+@@ -122,7 +122,7 @@
+ 
+     # grok arguments
+     if len(args) < 1:
+-        usage(1, _('listname is required'))
++        usage(1, C_('listname is required'))
+     listname = args[0].lower().strip()
+ 
+     if len(args) < 2:
+@@ -140,7 +140,7 @@
+         try:
+             mlist = MailList(listname)
+         except Errors.MMListError, e:
+-            usage(2, _('No such list "%(listname)s"\n%(e)s'))
++            usage(2, C_('No such list "%(listname)s"\n%(e)s'))
+         if mbox is None:
+             mbox = mlist.ArchiveFileName()
+ 
+@@ -165,7 +165,7 @@
+         try:
+             fp = open(mbox)
+         except IOError, msg:
+-            usage(3, _('Cannot open mbox file %(mbox)s: %(msg)s'))
++            usage(3, C_('Cannot open mbox file %(mbox)s: %(msg)s'))
+         # Maybe wipe the old archives
+         if wipe:
+             if mlist.scrub_nondigest:
+diff -ruN mailman-2.1.12-a/bin/b4b5-archfix mailman-2.1.12-b/bin/b4b5-archfix
+--- mailman-2.1.12-a/bin/b4b5-archfix	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/b4b5-archfix	2009-07-28 12:19:54.000000000 +0200
+@@ -44,7 +44,7 @@
+ 
+ # Required to get the right classes for unpickling
+ import paths
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ PROGRAM = sys.argv[0]
+ 
+@@ -55,7 +55,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+diff -ruN mailman-2.1.12-a/bin/change_pw mailman-2.1.12-b/bin/change_pw
+--- mailman-2.1.12-a/bin/change_pw	2009-07-28 12:19:50.000000000 +0200
++++ mailman-2.1.12-b/bin/change_pw	2009-07-28 12:19:54.000000000 +0200
+@@ -76,7 +76,7 @@
+ from Mailman import Message
+ from Mailman import i18n
+ 
+-_ = i18n._
++C_ = i18n.C_
+ 
+ SPACE = ' '
+ 
+@@ -87,7 +87,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+@@ -103,7 +103,7 @@
+         try:
+             mlist = MailList.MailList(listname, lock=0)
+         except Errors.MMListError, e:
+-            usage(1, _('No such list "%(listname)s"\n%(e)s'))
++            usage(1, C_('No such list "%(listname)s"\n%(e)s'))
+         _listcache[listname] = mlist
+     return mlist
+ 
+@@ -141,11 +141,11 @@
+ 
+     if args:
+         strargs = SPACE.join(args)
+-        usage(1, _('Bad arguments: %(strargs)s'))
++        usage(1, C_('Bad arguments: %(strargs)s'))
+ 
+     if password is not None:
+         if not password:
+-            usage(1, _('Empty list passwords are not allowed'))
++            usage(1, C_('Empty list passwords are not allowed'))
+         shapassword = Utils.sha_new(password).hexdigest()
+ 
+     if domains:
+@@ -155,7 +155,7 @@
+                 listnames[name] = 1
+ 
+     if not listnames:
+-        print >> sys.stderr, _('Nothing to do.')
++        print >> sys.stderr, C_('Nothing to do.')
+         sys.exit(0)
+ 
+     # Set the password on the lists
+@@ -177,7 +177,7 @@
+             mlist.Unlock()
+ 
+         # Notification
+-        print _('New %(listname)s password: %(notifypassword)s')
++        print C_('New %(listname)s password: %(notifypassword)s')
+         if not quiet:
+             otrans = i18n.get_translation()
+             i18n.set_language(mlist.preferred_language)
+diff -ruN mailman-2.1.12-a/bin/check_db mailman-2.1.12-b/bin/check_db
+--- mailman-2.1.12-a/bin/check_db	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/check_db	2009-07-28 12:19:54.000000000 +0200
+@@ -59,7 +59,7 @@
+ from Mailman import mm_cfg
+ from Mailman import Utils
+ from Mailman.MailList import MailList
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ PROGRAM = sys.argv[0]
+ 
+@@ -70,7 +70,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+@@ -111,12 +111,12 @@
+ 
+     listnames = [n.lower().strip() for n in listnames]
+     if not listnames:
+-        print _('Nothing to do.')
++        print C_('Nothing to do.')
+         sys.exit(0)
+ 
+     for listname in listnames:
+         if not Utils.list_exists(listname):
+-            print _('No list named:'), listname
++            print C_('No list named:'), listname
+             continue
+         mlist = MailList(listname, lock=0)
+         pfile = os.path.join(mlist.fullpath(), 'config.pck')
+@@ -125,7 +125,7 @@
+         dlast = dfile + '.last'
+ 
+         if verbose:
+-            print _('List:'), listname
++            print C_('List:'), listname
+ 
+         for file in (pfile, plast, dfile, dlast):
+             status = 0
+@@ -145,7 +145,7 @@
+                 else:
+                     print '    %s: %s' % (file, status)
+             elif verbose:
+-                print _('   %(file)s: okay')
++                print C_('   %(file)s: okay')
+ 
+ 
+ 
+diff -ruN mailman-2.1.12-a/bin/check_perms mailman-2.1.12-b/bin/check_perms
+--- mailman-2.1.12-a/bin/check_perms	2009-07-28 12:19:50.000000000 +0200
++++ mailman-2.1.12-b/bin/check_perms	2009-07-28 12:19:54.000000000 +0200
+@@ -45,7 +45,7 @@
+     raise
+ from Mailman import mm_cfg
+ from Mailman.mm_cfg import MAILMAN_USER, MAILMAN_GROUP
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ # Let KeyErrors percolate
+ MAILMAN_GID = grp.getgrnam(MAILMAN_GROUP)[2]
+@@ -107,7 +107,7 @@
+     for name in names:
+         path = os.path.join(dirname, name)
+         if arg.VERBOSE:
+-            print _('    checking gid and mode for %(path)s')
++            print C_('    checking gid and mode for %(path)s')
+         try:
+             mode, gid = statgidmode(path)
+         except OSError, e:
+@@ -119,10 +119,10 @@
+             except KeyError:
+                 groupname = '<anon gid %d>' % gid
+             arg.ERRORS += 1
+-            print _('%(path)s bad group (has: %(groupname)s, '
++            print C_('%(path)s bad group (has: %(groupname)s, '
+                     'expected %(MAILMAN_GROUP)s)'),
+             if STATE.FIX:
+-                print _('(fixing)')
++                print C_('(fixing)')
+                 os.chown(path, -1, MAILMAN_GID)
+             else:
+                 print
+@@ -148,19 +148,19 @@
+         octperms = oct(targetperms)
+         if S_ISDIR(mode) and (mode & targetperms) <> targetperms:
+             arg.ERRORS += 1
+-            print _('directory permissions must be %(octperms)s: %(path)s'),
++            print C_('directory permissions must be %(octperms)s: %(path)s'),
+             if STATE.FIX:
+-                print _('(fixing)')
++                print C_('(fixing)')
+                 os.chmod(path, mode | targetperms)
+             else:
+                 print
+         elif os.path.splitext(path)[1] in ('.py', '.pyc', '.pyo'):
+             octperms = oct(PYFILEPERMS)
+             if mode & PYFILEPERMS <> PYFILEPERMS:
+-                print _('source perms must be %(octperms)s: %(path)s'),
++                print C_('source perms must be %(octperms)s: %(path)s'),
+                 arg.ERRORS += 1
+                 if STATE.FIX:
+-                    print _('(fixing)')
++                    print C_('(fixing)')
+                     os.chmod(path, mode | PYFILEPERMS)
+                 else:
+                     print
+@@ -168,10 +168,10 @@
+             # Article files must be group writeable
+             octperms = oct(ARTICLEFILEPERMS)
+             if mode & ARTICLEFILEPERMS <> ARTICLEFILEPERMS:
+-                print _('article db files must be %(octperms)s: %(path)s'),
++                print C_('article db files must be %(octperms)s: %(path)s'),
+                 arg.ERRORS += 1
+                 if STATE.FIX:
+-                    print _('(fixing)')
++                    print C_('(fixing)')
+                     os.chmod(path, mode | ARTICLEFILEPERMS)
+                 else:
+                     print
+@@ -180,7 +180,7 @@
+     # first check PREFIX
+     if STATE.VERBOSE:
+         prefix = mm_cfg.PREFIX
+-        print _('checking mode for %(prefix)s')
++        print C_('checking mode for %(prefix)s')
+     dirs = {}
+     for d in (mm_cfg.PREFIX, mm_cfg.EXEC_PREFIX, mm_cfg.VAR_PREFIX,
+               mm_cfg.CONFIG_DIR, mm_cfg.DATA_DIR, mm_cfg.LOCK_DIR,
+@@ -191,13 +191,13 @@
+             mode = statmode(d)
+         except OSError, e:
+             if e.errno <> errno.ENOENT: raise
+-            print _('WARNING: directory does not exist: %(d)s')
++            print C_('WARNING: directory does not exist: %(d)s')
+             continue
+         if (mode & DIRPERMS) <> DIRPERMS:
+             STATE.ERRORS += 1
+-            print _('directory must be at least 02775: %(d)s'),
++            print C_('directory must be at least 02775: %(d)s'),
+             if STATE.FIX:
+-                print _('(fixing)')
++                print C_('(fixing)')
+                 os.chmod(d, mode | DIRPERMS)
+             else:
+                 print
+@@ -207,14 +207,14 @@
+ def checkarchives():
+     private = mm_cfg.PRIVATE_ARCHIVE_FILE_DIR
+     if STATE.VERBOSE:
+-        print _('checking perms on %(private)s')
++        print C_('checking perms on %(private)s')
+     # private archives must not be other readable
+     mode = statmode(private)
+     if mode & S_IROTH:
+         STATE.ERRORS += 1
+-        print _('%(private)s must not be other-readable'),
++        print C_('%(private)s must not be other-readable'),
+         if STATE.FIX:
+-            print _('(fixing)')
++            print C_('(fixing)')
+             os.chmod(private, mode & ~S_IROTH)
+         else:
+             print
+@@ -238,9 +238,9 @@
+         mode = statmode(mboxfile)
+         if (mode & MBOXPERMS) <> MBOXPERMS:
+             STATE.ERRORS = STATE.ERRORS + 1
+-            print _('mbox file must be at least 0660:'), mboxfile
++            print C_('mbox file must be at least 0660:'), mboxfile
+             if STATE.FIX:
+-                print _('(fixing)')
++                print C_('(fixing)')
+                 os.chmod(mboxfile, mode | MBOXPERMS)
+             else:
+                 print
+@@ -261,9 +261,9 @@
+             continue
+         if mode & S_IRWXO:
+             STATE.ERRORS += 1
+-            print _('%(dbdir)s "other" perms must be 000'),
++            print C_('%(dbdir)s "other" perms must be 000'),
+             if STATE.FIX:
+-                print _('(fixing)')
++                print C_('(fixing)')
+                 os.chmod(dbdir, mode & ~S_IRWXO)
+             else:
+                 print
+@@ -271,18 +271,18 @@
+ def checkcgi():
+     cgidir = os.path.join(mm_cfg.EXEC_PREFIX, 'cgi-bin')
+     if STATE.VERBOSE:
+-        print _('checking cgi-bin permissions')
++        print C_('checking cgi-bin permissions')
+     exes = os.listdir(cgidir)
+     for f in exes:
+         path = os.path.join(cgidir, f)
+         if STATE.VERBOSE:
+-            print _('    checking set-gid for %(path)s')
++            print C_('    checking set-gid for %(path)s')
+         mode = statmode(path)
+         if mode & S_IXGRP and not mode & S_ISGID:
+             STATE.ERRORS += 1
+-            print _('%(path)s must be set-gid'),
++            print C_('%(path)s must be set-gid'),
+             if STATE.FIX:
+-                print _('(fixing)')
++                print C_('(fixing)')
+                 os.chmod(path, mode | S_ISGID)
+             else:
+                 print
+@@ -290,13 +290,13 @@
+ def checkmail():
+     wrapper = os.path.join(mm_cfg.WRAPPER_DIR, 'mailman')
+     if STATE.VERBOSE:
+-        print _('checking set-gid for %(wrapper)s')
++        print C_('checking set-gid for %(wrapper)s')
+     mode = statmode(wrapper)
+     if not mode & S_ISGID:
+         STATE.ERRORS += 1
+-        print _('%(wrapper)s must be set-gid'),
++        print C_('%(wrapper)s must be set-gid'),
+         if STATE.FIX:
+-            print _('(fixing)')
++            print C_('(fixing)')
+             os.chmod(wrapper, mode | S_ISGID)
+ 
+ def checkadminpw():
+@@ -304,7 +304,7 @@
+                    os.path.join(mm_cfg.DATA_DIR, 'creator.pw')):
+         targetmode = S_IFREG | S_IRUSR | S_IWUSR | S_IRGRP
+         if STATE.VERBOSE:
+-            print _('checking permissions on %(pwfile)s')
++            print C_('checking permissions on %(pwfile)s')
+         try:
+             mode = statmode(pwfile)
+         except OSError, e:
+@@ -313,10 +313,10 @@
+         if mode <> targetmode:
+             STATE.ERRORS += 1
+             octmode = oct(mode)
+-            print _('%(pwfile)s permissions must be exactly 0640 '
++            print C_('%(pwfile)s permissions must be exactly 0640 '
+                     '(got %(octmode)s)'),
+             if STATE.FIX:
+-                print _('(fixing)')
++                print C_('(fixing)')
+                 os.chmod(pwfile, targetmode)
+             else:
+                 print
+@@ -338,13 +338,13 @@
+                   'digest.mbox', 'pending.pck',
+                   'request.db', 'request.db.tmp')
+     if STATE.VERBOSE:
+-        print _('checking permissions on list data')
++        print C_('checking permissions on list data')
+     # BAW: This needs to be converted to the Site module abstraction
+     for dir in os.listdir(mm_cfg.LIST_DATA_DIR):
+         for file in checkfiles:
+             path = os.path.join(mm_cfg.LIST_DATA_DIR, dir, file)
+             if STATE.VERBOSE:
+-                print _('    checking permissions on: %(path)s')
++                print C_('    checking permissions on: %(path)s')
+             try:
+                 mode = statmode(path)
+             except OSError, e:
+@@ -352,9 +352,9 @@
+                 continue
+             if (mode & targetmode) <> targetmode:
+                 STATE.ERRORS += 1
+-                print _('file permissions must be at least 660: %(path)s'),
++                print C_('file permissions must be at least 660: %(path)s'),
+                 if STATE.FIX:
+-                    print _('(fixing)')
++                    print C_('(fixing)')
+                     os.chmod(path, mode | targetmode)
+                 else:
+                     print
+@@ -366,7 +366,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+@@ -397,7 +397,7 @@
+     checkmta()
+ 
+     if not STATE.ERRORS:
+-        print _('No problems found')
++        print C_('No problems found')
+     else:
+-        print _('Problems found:'), STATE.ERRORS
+-        print _('Re-run as %(MAILMAN_USER)s (or root) with -f flag to fix')
++        print C_('Problems found:'), STATE.ERRORS
++        print C_('Re-run as %(MAILMAN_USER)s (or root) with -f flag to fix')
+diff -ruN mailman-2.1.12-a/bin/cleanarch mailman-2.1.12-b/bin/cleanarch
+--- mailman-2.1.12-a/bin/cleanarch	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/cleanarch	2009-07-28 12:19:54.000000000 +0200
+@@ -53,7 +53,7 @@
+ import mailbox
+ 
+ import paths
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ cre = re.compile(mailbox.UnixMailbox._fromlinepattern)
+ 
+@@ -69,7 +69,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+@@ -80,7 +80,7 @@
+     if output:
+         sys.stdout.write('>' + line)
+     if not quiet:
+-        print >> sys.stderr, _('Unix-From line changed: %(lineno)d')
++        print >> sys.stderr, C_('Unix-From line changed: %(lineno)d')
+         print >> sys.stderr, line[:-1]
+ 
+ 
+@@ -108,7 +108,7 @@
+             try:
+                 status = int(arg)
+             except ValueError:
+-                usage(1, _('Bad status number: %(arg)s'))
++                usage(1, C_('Bad status number: %(arg)s'))
+ 
+     if args:
+         usage(1)
+@@ -164,7 +164,7 @@
+                 print >> sys.stderr
+                 statuscnt = 0
+         prevline = line
+-    print >> sys.stderr, _('%(messages)d messages found')
++    print >> sys.stderr, C_('%(messages)d messages found')
+ 
+ 
+ 
+diff -ruN mailman-2.1.12-a/bin/clone_member mailman-2.1.12-b/bin/clone_member
+--- mailman-2.1.12-a/bin/clone_member	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/clone_member	2009-07-28 12:19:54.000000000 +0200
+@@ -72,7 +72,7 @@
+ from Mailman import MailList
+ from Mailman import Utils
+ from Mailman import Errors
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ 
+ 
+@@ -81,7 +81,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+@@ -91,14 +91,14 @@
+ def dolist(mlist, options):
+     SPACE = ' '
+     if not options.quiet:
+-        print _('processing mailing list:'), mlist.internal_name()
++        print C_('processing mailing list:'), mlist.internal_name()
+ 
+     # scan the list owners.  TBD: mlist.owner keys should be lowercase?
+     oldowners = mlist.owner[:]
+     oldowners.sort()
+     if options.admintoo:
+         if not options.quiet:
+-            print _('    scanning list owners:'), SPACE.join(oldowners)
++            print C_('    scanning list owners:'), SPACE.join(oldowners)
+         newowners = {}
+         foundp = 0
+         for owner in mlist.owner:
+@@ -116,9 +116,9 @@
+         if not options.quiet:
+             if newowners <> oldowners:
+                 print
+-                print _('    new list owners:'), SPACE.join(newowners)
++                print C_('    new list owners:'), SPACE.join(newowners)
+             else:
+-                print _('(no change)')
++                print C_('(no change)')
+ 
+     # see if the fromaddr is a digest member or regular member
+     if options.lfromaddr in mlist.getDigestMemberKeys():
+@@ -127,13 +127,13 @@
+         digest = 0
+     else:
+         if not options.quiet:
+-            print _('    address not found:'), options.fromaddr
++            print C_('    address not found:'), options.fromaddr
+         return
+     # Check for banned to address.
+     pattern = mlist.GetBannedPattern(options.toaddr)
+     if pattern:
+         if not options.quiet:
+-            print '   ', _('Banned address (matched %(pattern)s)')
++            print '   ', C_('Banned address (matched %(pattern)s)')
+         return
+ 
+     # Now change the membership address
+@@ -142,13 +142,13 @@
+             mlist.changeMemberAddress(options.fromaddr, options.toaddr,
+                                       not options.remove)
+         if not options.quiet:
+-            print _('    clone address added:'), options.toaddr
++            print C_('    clone address added:'), options.toaddr
+     except Errors.MMAlreadyAMember:
+         if not options.quiet:
+-            print _('    clone address is already a member:'), options.toaddr
++            print C_('    clone address is already a member:'), options.toaddr
+ 
+     if options.remove:
+-        print _('    original address removed:'), options.fromaddr
++        print C_('    original address removed:'), options.fromaddr
+ 
+ 
+ 
+@@ -199,7 +199,7 @@
+     try:
+         Utils.ValidateEmail(toaddr)
+     except Errors.EmailAddressError:
+-        usage(1, _('Not a valid email address: %(toaddr)s'))
++        usage(1, C_('Not a valid email address: %(toaddr)s'))
+     lfromaddr = fromaddr.lower()
+     options.toaddr = toaddr
+     options.fromaddr = fromaddr
+@@ -212,7 +212,7 @@
+         try:
+             mlist = MailList.MailList(listname)
+         except Errors.MMListError, e:
+-            print _('Error opening list "%(listname)s", skipping.\n%(e)s')
++            print C_('Error opening list "%(listname)s", skipping.\n%(e)s')
+             continue
+         try:
+             dolist(mlist, options)
+diff -ruN mailman-2.1.12-a/bin/config_list mailman-2.1.12-b/bin/config_list
+--- mailman-2.1.12-a/bin/config_list	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/config_list	2009-07-28 12:19:54.000000000 +0200
+@@ -75,7 +75,7 @@
+ from Mailman import Errors
+ from Mailman import i18n
+ 
+-_ = i18n._
++C_ = i18n.C_
+ 
+ NL = '\n'
+ nonasciipat = re.compile(r'[\x80-\xff]')
+@@ -87,7 +87,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+@@ -106,7 +106,7 @@
+         try:
+             mlist = MailList.MailList(listname, lock=0)
+         except Errors.MMListError:
+-            usage(1, _('No such list: %(listname)s'))
++            usage(1, C_('No such list: %(listname)s'))
+         # Preamble for the config info. PEP263 charset and capture time.
+         language = mlist.preferred_language
+         charset = Utils.GetCharSet(language)
+@@ -114,7 +114,7 @@
+         if not charset:
+             charset = 'us-ascii'
+         when = time.ctime(time.time())
+-        print >> outfp, _('''\
++        print >> outfp, C_('''\
+ # -*- python -*-
+ # -*- coding: %(charset)s -*-
+ ## "%(listname)s" mailing list configuration settings
+@@ -140,7 +140,7 @@
+     if info is None:
+         return
+     charset = Utils.GetCharSet(mlist.preferred_language)
+-    print >> outfp, '##', k.capitalize(), _('options')
++    print >> outfp, '##', k.capitalize(), C_('options')
+     print >> outfp, '#'
+     # First, massage the descripton text, which could have obnoxious
+     # leading whitespace on second and subsequent lines due to
+@@ -199,7 +199,7 @@
+                     outfp.write('"""\n')
+         elif vtype in (mm_cfg.Radio, mm_cfg.Toggle):
+             print >> outfp, '#'
+-            print >> outfp, '#', _('legal values are:')
++            print >> outfp, '#', C_('legal values are:')
+             # TBD: This is disgusting, but it's special cased
+             # everywhere else anyway...
+             if varname == 'subscribe_policy' and \
+@@ -253,7 +253,7 @@
+     try:
+         mlist = MailList.MailList(listname, lock=not checkonly)
+     except Errors.MMListError, e:
+-        usage(1, _('No such list "%(listname)s"\n%(e)s'))
++        usage(1, C_('No such list "%(listname)s"\n%(e)s'))
+     savelist = 0
+     guibyprop = getPropertyMap(mlist)
+     try:
+@@ -266,16 +266,16 @@
+             if k in ('mlist', '__builtins__'):
+                 continue
+             if not hasattr(mlist, k):
+-                print >> sys.stderr, _('attribute "%(k)s" ignored')
++                print >> sys.stderr, C_('attribute "%(k)s" ignored')
+                 continue
+             if verbose:
+-                print >> sys.stderr, _('attribute "%(k)s" changed')
++                print >> sys.stderr, C_('attribute "%(k)s" changed')
+             missing = []
+             gui, wtype = guibyprop.get(k, (missing, missing))
+             if gui is missing:
+                 # This isn't an official property of the list, but that's
+                 # okay, we'll just restore it the old fashioned way
+-                print >> sys.stderr, _('Non-standard property restored: %(k)s')
++                print >> sys.stderr, C_('Non-standard property restored: %(k)s')
+                 setattr(mlist, k, v)
+             else:
+                 # BAW: This uses non-public methods.  This logic taken from
+@@ -283,9 +283,9 @@
+                 try:
+                     validval = gui._getValidValue(mlist, k, wtype, v)
+                 except ValueError:
+-                    print >> sys.stderr, _('Invalid value for property: %(k)s')
++                    print >> sys.stderr, C_('Invalid value for property: %(k)s')
+                 except Errors.EmailAddressError:
+-                    print >> sys.stderr, _(
++                    print >> sys.stderr, C_(
+                         'Bad email address for option %(k)s: %(v)s')
+                 else:
+                     # BAW: Horrible hack, but then this is special cased
+@@ -342,13 +342,13 @@
+ 
+     # sanity check
+     if infile is not None and outfile is not None:
+-        usage(1, _('Only one of -i or -o is allowed'))
++        usage(1, C_('Only one of -i or -o is allowed'))
+     if infile is None and outfile is None:
+-        usage(1, _('One of -i or -o is required'))
++        usage(1, C_('One of -i or -o is required'))
+ 
+     # get the list name
+     if len(args) <> 1:
+-        usage(1, _('List name is required'))
++        usage(1, C_('List name is required'))
+     listname = args[0].lower().strip()
+ 
+     if outfile:
+diff -ruN mailman-2.1.12-a/bin/convert.py mailman-2.1.12-b/bin/convert.py
+--- mailman-2.1.12-a/bin/convert.py	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/convert.py	2009-07-28 12:19:54.000000000 +0200
+@@ -25,7 +25,7 @@
+ 
+ import paths
+ from Mailman import Utils
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ def convert(mlist):
+     for attr in ('msg_header', 'msg_footer', 'digest_header', 'digest_footer',
+@@ -35,10 +35,10 @@
+         t = Utils.to_dollar(s)
+         setattr(mlist, attr, t)
+     mlist.use_dollar_strings = 1
+-    print _('Saving list')
++    print C_('Saving list')
+     mlist.Save()
+ 
+ 
+ 
+ if __name__ == '__main__':
+-    print _(__doc__.replace('%', '%%'))
++    print C_(__doc__.replace('%', '%%'))
+diff -ruN mailman-2.1.12-a/bin/discard mailman-2.1.12-b/bin/discard
+--- mailman-2.1.12-a/bin/discard	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/discard	2009-07-28 12:19:54.000000000 +0200
+@@ -41,7 +41,7 @@
+ import paths
+ from Mailman import mm_cfg
+ from Mailman.MailList import MailList
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ try:
+     True, False
+@@ -58,7 +58,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+@@ -80,7 +80,7 @@
+ 
+     files = args
+     if not files:
+-        print _('Nothing to do.')
++        print C_('Nothing to do.')
+ 
+     # Mapping from listnames to sequence of request ids
+     discards = {}
+@@ -91,13 +91,13 @@
+         basename = os.path.basename(f)
+         mo = cre.match(basename)
+         if not mo:
+-            print >> sys.stderr, _('Ignoring non-held message: %(f)s')
++            print >> sys.stderr, C_('Ignoring non-held message: %(f)s')
+             continue
+         listname, id = mo.group('listname', 'id')
+         try:
+             id = int(id)
+         except (ValueError, TypeError):
+-            print >> sys.stderr, _('Ignoring held msg w/bad id: %(f)s')
++            print >> sys.stderr, C_('Ignoring held msg w/bad id: %(f)s')
+             continue
+         discards.setdefault(listname, []).append(id)
+ 
+@@ -109,7 +109,7 @@
+                 # No comment, no preserve, no forward, no forwarding address
+                 mlist.HandleRequest(id, mm_cfg.DISCARD, '', False, False, '')
+                 if not quiet:
+-                    print _('Discarded held msg #%(id)s for list %(listname)s')
++                    print C_('Discarded held msg #%(id)s for list %(listname)s')
+             mlist.Save()
+         finally:
+             mlist.Unlock()
+diff -ruN mailman-2.1.12-a/bin/dumpdb mailman-2.1.12-b/bin/dumpdb
+--- mailman-2.1.12-a/bin/dumpdb	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/dumpdb	2009-07-28 12:19:54.000000000 +0200
+@@ -54,7 +54,7 @@
+ 
+ import paths
+ # Import this /after/ paths so that the sys.path is properly hacked
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ PROGRAM = sys.argv[0]
+ COMMASPACE = ', '
+@@ -72,7 +72,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__) % globals()
++    print >> fd, C_(__doc__) % globals()
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+@@ -102,10 +102,10 @@
+             doprint = False
+ 
+     if len(args) < 1:
+-        usage(1, _('No filename given.'))
++        usage(1, C_('No filename given.'))
+     elif len(args) > 1:
+         pargs = COMMASPACE.join(args)
+-        usage(1, _('Bad arguments: %(pargs)s'))
++        usage(1, C_('Bad arguments: %(pargs)s'))
+     else:
+         filename = args[0]
+ 
+@@ -115,7 +115,7 @@
+         elif filename.endswith('.pck'):
+             filetype = 0
+         else:
+-            usage(1, _('Please specify either -p or -m.'))
++            usage(1, C_('Please specify either -p or -m.'))
+ 
+     # Handle dbs
+     pp = pprint.PrettyPrinter(indent=4)
+@@ -130,16 +130,16 @@
+     try:
+         cnt = 1
+         if doprint:
+-            print _('[----- start %(typename)s file -----]')
++            print C_('[----- start %(typename)s file -----]')
+         while True:
+             try:
+                 obj = load(fp)
+             except EOFError:
+                 if doprint:
+-                    print _('[----- end %(typename)s file -----]')
++                    print C_('[----- end %(typename)s file -----]')
+                 break
+             if doprint:
+-                print _('<----- start object %(cnt)s ----->')
++                print C_('<----- start object %(cnt)s ----->')
+                 if isinstance(obj, StringType):
+                     print obj
+                 else:
+diff -ruN mailman-2.1.12-a/bin/find_member mailman-2.1.12-b/bin/find_member
+--- mailman-2.1.12-a/bin/find_member	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/find_member	2009-07-28 12:19:54.000000000 +0200
+@@ -64,7 +64,7 @@
+ from Mailman import Utils
+ from Mailman import MailList
+ from Mailman import Errors
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ AS_MEMBER = 0x01
+ AS_OWNER = 0x02
+@@ -94,7 +94,7 @@
+         try:
+             mlist = MailList.MailList(listname, lock=0)
+         except Errors.MMListError:
+-            print _('No such list: %(listname)s')
++            print C_('No such list: %(listname)s')
+             continue
+         if options.owners:
+             owners = mlist.owner
+@@ -156,12 +156,12 @@
+             pass
+ 
+     if not args:
+-        usage(1, _('Search regular expression required'))
++        usage(1, C_('Search regular expression required'))
+ 
+     options.regexps = args
+ 
+     if not options.listnames:
+-        print _('No lists to search')
++        print C_('No lists to search')
+         return
+ 
+     matches = scanlists(options)
+@@ -170,13 +170,13 @@
+     for k in addrs:
+         hits = matches[k]
+         lists = hits.keys()
+-        print k, _('found in:')
++        print k, C_('found in:')
+         for name in lists:
+             aswhat = hits[name]
+             if aswhat & AS_MEMBER:
+                 print '    ', name
+             if aswhat & AS_OWNER:
+-                print '    ', name, _('(as owner)')
++                print '    ', name, C_('(as owner)')
+ 
+ 
+ 
+diff -ruN mailman-2.1.12-a/bin/fix_url.py mailman-2.1.12-b/bin/fix_url.py
+--- mailman-2.1.12-a/bin/fix_url.py	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/fix_url.py	2009-07-28 12:19:54.000000000 +0200
+@@ -43,12 +43,12 @@
+ 
+ import paths
+ from Mailman import mm_cfg
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ 
+ 
+ def usage(code, msg=''):
+-    print _(__doc__.replace('%', '%%'))
++    print C_(__doc__.replace('%', '%%'))
+     if msg:
+         print msg
+     sys.exit(code)
+@@ -77,12 +77,12 @@
+         mailhost = mm_cfg.DEFAULT_EMAIL_HOST
+ 
+     if verbose:
+-        print _('Setting web_page_url to: %(web_page_url)s')
++        print C_('Setting web_page_url to: %(web_page_url)s')
+     mlist.web_page_url = web_page_url
+     if verbose:
+-        print _('Setting host_name to: %(mailhost)s')
++        print C_('Setting host_name to: %(mailhost)s')
+     mlist.host_name = mailhost
+-    print _('Saving list')
++    print C_('Saving list')
+     mlist.Save()
+     mlist.Unlock()
+ 
+diff -ruN mailman-2.1.12-a/bin/genaliases mailman-2.1.12-b/bin/genaliases
+--- mailman-2.1.12-a/bin/genaliases	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/genaliases	2009-07-28 12:19:54.000000000 +0200
+@@ -40,7 +40,7 @@
+ from Mailman import mm_cfg
+ from Mailman import Utils
+ from Mailman import MailList
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ try:
+     True, False
+diff -ruN mailman-2.1.12-a/bin/inject mailman-2.1.12-b/bin/inject
+--- mailman-2.1.12-a/bin/inject	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/inject	2009-07-28 12:19:54.000000000 +0200
+@@ -48,7 +48,7 @@
+ from Mailman import mm_cfg
+ from Mailman import Utils
+ from Mailman import Post
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ 
+ 
+@@ -57,7 +57,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+@@ -81,14 +81,14 @@
+         elif opt in ('-q', '--queue'):
+             qdir = os.path.join(mm_cfg.QUEUE_DIR, arg)
+             if not os.path.isdir(qdir):
+-                usage(1, _('Bad queue directory: %(qdir)s'))
++                usage(1, C_('Bad queue directory: %(qdir)s'))
+         elif opt in ('-l', '--listname'):
+             listname = arg.lower()
+ 
+     if listname is None:
+-        usage(1, _('A list name is required'))
++        usage(1, C_('A list name is required'))
+     elif not Utils.list_exists(listname):
+-        usage(1, _('No such list: %(listname)s'))
++        usage(1, C_('No such list: %(listname)s'))
+ 
+     if len(args) == 0:
+         # Use standard input
+diff -ruN mailman-2.1.12-a/bin/list_admins mailman-2.1.12-b/bin/list_admins
+--- mailman-2.1.12-a/bin/list_admins	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/list_admins	2009-07-28 12:19:54.000000000 +0200
+@@ -45,7 +45,7 @@
+ import paths
+ from Mailman import MailList, Utils
+ from Mailman import Errors
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ COMMASPACE = ', '
+ 
+@@ -58,7 +58,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+@@ -87,14 +87,14 @@
+        try:
+            mlist = MailList.MailList(listname, lock=0)
+        except Errors.MMListError, e:
+-           print _('No such list: %(listname)s')
++           print C_('No such list: %(listname)s')
+            continue
+ 
+        if vhost and vhost <> mlist.host_name:
+            continue
+ 
+        owners = COMMASPACE.join(mlist.owner)
+-       print _('List: %(listname)s, \tOwners: %(owners)s')
++       print C_('List: %(listname)s, \tOwners: %(owners)s')
+ 
+ 
+ 
+diff -ruN mailman-2.1.12-a/bin/list_lists mailman-2.1.12-b/bin/list_lists
+--- mailman-2.1.12-a/bin/list_lists	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/list_lists	2009-07-28 12:19:54.000000000 +0200
+@@ -47,7 +47,7 @@
+ from Mailman import MailList
+ from Mailman import Utils
+ from Mailman import Errors
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ program = sys.argv[0]
+ 
+@@ -56,7 +56,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+@@ -102,18 +102,18 @@
+         longest = max(len(mlist.real_name), longest)
+ 
+     if not mlists and not bare:
+-        print _('No matching mailing lists found')
++        print C_('No matching mailing lists found')
+         return
+ 
+     if not bare:
+-        print len(mlists), _('matching mailing lists found:')
++        print len(mlists), C_('matching mailing lists found:')
+ 
+     format = '%%%ds - %%.%ds' % (longest, 77 - longest)
+     for mlist in mlists:
+         if bare:
+             print mlist.internal_name()
+         else:
+-            description = mlist.description or _('[no description available]')
++            description = mlist.description or C_('[no description available]')
+             print '   ', format % (mlist.real_name, description)
+ 
+ 
+diff -ruN mailman-2.1.12-a/bin/list_members mailman-2.1.12-b/bin/list_members
+--- mailman-2.1.12-a/bin/list_members	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/list_members	2009-07-28 12:19:54.000000000 +0200
+@@ -76,7 +76,7 @@
+ from Mailman import MailList
+ from Mailman import Errors
+ from Mailman import MemberAdaptor
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ from email.Utils import formataddr
+ 
+@@ -104,7 +104,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+@@ -188,7 +188,7 @@
+             if i >= 0:
+                 why = opt[i+1:]
+                 if why not in WHYCHOICES.keys():
+-                    usage(1, _('Bad --nomail option: %(why)s'))
++                    usage(1, C_('Bad --nomail option: %(why)s'))
+         elif opt == '-d':
+             digest = True
+             if args and args[0] in ('mime', 'plain'):
+@@ -199,7 +199,7 @@
+             if i >= 0:
+                 kind = opt[i+1:]
+                 if kind not in ('mime', 'plain'):
+-                    usage(1, _('Bad --digest option: %(kind)s'))
++                    usage(1, C_('Bad --digest option: %(kind)s'))
+         elif opt in ('-i', '--invalid'):
+             invalidonly = True
+         elif opt in ('-u', '--unicode'):
+@@ -221,7 +221,7 @@
+         try:
+             fp = open(outfile, 'w')
+         except IOError:
+-            print >> sys.stderr, _('Could not open file for writing:'), outfile
++            print >> sys.stderr, C_('Could not open file for writing:'), outfile
+             sys.exit(1)
+     else:
+         fp = sys.stdout
+@@ -229,7 +229,7 @@
+     try:
+         mlist = MailList.MailList(listname, lock=False)
+     except Errors.MMListError, e:
+-        print >> sys.stderr, _('No such list: %(listname)s')
++        print >> sys.stderr, C_('No such list: %(listname)s')
+         sys.exit(1)
+ 
+     # Get the lowercased member addresses
+diff -ruN mailman-2.1.12-a/bin/list_owners mailman-2.1.12-b/bin/list_owners
+--- mailman-2.1.12-a/bin/list_owners	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/list_owners	2009-07-28 12:19:54.000000000 +0200
+@@ -45,7 +45,7 @@
+ import paths
+ from Mailman import Utils
+ from Mailman.MailList import MailList
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ PROGRAM = sys.argv[0]
+ 
+@@ -62,7 +62,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+diff -ruN mailman-2.1.12-a/bin/mailmanctl mailman-2.1.12-b/bin/mailmanctl
+--- mailman-2.1.12-a/bin/mailmanctl	2009-07-28 12:19:48.000000000 +0200
++++ mailman-2.1.12-b/bin/mailmanctl	2009-07-28 12:19:54.000000000 +0200
+@@ -111,7 +111,7 @@
+ from Mailman import LockFile
+ from Mailman import Errors
+ from Mailman.MailList import MailList
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ from Mailman.Logging.Syslog import syslog
+ from Mailman.Logging.Utils import LogStdErr
+ 
+@@ -136,7 +136,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+@@ -152,17 +152,17 @@
+     except (IOError, ValueError), e:
+         # For i18n convenience
+         pidfile = mm_cfg.PIDFILE
+-        print >> sys.stderr, _('PID unreadable in: %(pidfile)s')
++        print >> sys.stderr, C_('PID unreadable in: %(pidfile)s')
+         print >> sys.stderr, e
+-        print >> sys.stderr, _('Is qrunner even running?')
++        print >> sys.stderr, C_('Is qrunner even running?')
+         return
+     try:
+         os.kill(pid, sig)
+     except OSError, e:
+         if e.errno <> errno.ESRCH: raise
+-        print >> sys.stderr, _('No child with pid: %(pid)s')
++        print >> sys.stderr, C_('No child with pid: %(pid)s')
+         print >> sys.stderr, e
+-        print >> sys.stderr, _('Stale pid file removed.')
++        print >> sys.stderr, C_('Stale pid file removed.')
+         os.unlink(mm_cfg.PIDFILE)
+ 
+ 
+@@ -266,19 +266,19 @@
+         status = qrunner_state()
+         if status == 1:
+             # host matches and proc exists
+-            print >> sys.stderr, _("""\
++            print >> sys.stderr, C_("""\
+ The master qrunner lock could not be acquired because it appears as if another
+ master qrunner is already running.
+ """)
+         elif status == 0:
+             # host matches but no proc
+-            print >> sys.stderr, _("""\
++            print >> sys.stderr, C_("""\
+ The master qrunner lock could not be acquired.  It appears as though there is
+ a stale master qrunner lock.  Try re-running mailmanctl with the -s flag.
+ """)
+         else:
+             # host doesn't even match
+-            print >> sys.stderr, _("""\
++            print >> sys.stderr, C_("""\
+ The master qrunner lock could not be acquired, because it appears as if some
+ process on some other host may have acquired it.  We can't test for stale
+ locks across host boundaries, so you'll have to do this manually.  Or, if you
+@@ -325,7 +325,7 @@
+     try:
+         sitelist = MailList(sitelistname, lock=0)
+     except Errors.MMUnknownListError:
+-        print >> sys.stderr, _('Site list is missing: %(sitelistname)s')
++        print >> sys.stderr, C_('Site list is missing: %(sitelistname)s')
+         syslog('error', 'Site list is missing: %s', mm_cfg.MAILMAN_SITE_LIST)
+         sys.exit(1)
+ 
+@@ -350,7 +350,7 @@
+         os.setuid(uid)
+     elif myuid <> uid:
+         name = mm_cfg.MAILMAN_USER
+-        usage(1, _(
++        usage(1, C_(
+             'Run this program as root or as the %(name)s user, or use -u.'))
+ 
+ 
+@@ -381,10 +381,10 @@
+             quiet = 1
+ 
+     if len(args) < 1:
+-        usage(1, _('No command given.'))
++        usage(1, C_('No command given.'))
+     elif len(args) > 1:
+         command = COMMASPACE.join(args)
+-        usage(1, _('Bad command: %(command)s'))
++        usage(1, C_('Bad command: %(command)s'))
+ 
+     command = args[0].lower()
+ 
+@@ -392,7 +392,7 @@
+         check_privs()
+     else:
+         if command != 'status':
+-	    print _('Warning!  You may encounter permission problems.')
++	    print C_('Warning!  You may encounter permission problems.')
+ 
+     # Handle the commands
+     if command == 'stop':
+@@ -400,26 +400,26 @@
+         # giving cron/qrunner a ctrl-c or KeyboardInterrupt.  This will
+         # effectively shut everything down.
+         if not quiet:
+-            print _("Shutting down Mailman's master qrunner")
++            print C_("Shutting down Mailman's master qrunner")
+         kill_watcher(signal.SIGTERM)
+     elif command == 'restart':
+         # Sent the master qrunner process a SIGHUP.  This will cause the
+         # master qrunner to kill and restart all the worker qrunners, and to
+         # close and re-open its log files.
+         if not quiet:
+-            print _("Restarting Mailman's master qrunner")
++            print C_("Restarting Mailman's master qrunner")
+         kill_watcher(signal.SIGINT)
+     elif command == 'reopen':
+         if not quiet:
+-            print _('Re-opening all log files')
++            print C_('Re-opening all log files')
+         kill_watcher(signal.SIGHUP)
+     elif command == 'status':
+         status, pid = mailman_status()
+         if not quiet:
+             if status == 0:
+-                print _("mailman (pid %(pid)d) is running...")
++                print C_("mailman (pid %(pid)d) is running...")
+             else:
+-                print _("mailman is stopped")
++                print C_("mailman is stopped")
+         sys.exit(status)
+     elif command == 'start':
+         # First, complain loudly if there's no site list.
+@@ -455,7 +455,7 @@
+         if pid:
+             # parent
+             if not quiet:
+-                print _("Starting Mailman's master qrunner.")
++                print C_("Starting Mailman's master qrunner.")
+             # Give up the lock "ownership".  This just means the foreground
+             # process won't close/unlock the lock when it finalizes this lock
+             # instance.  We'll let the mater watcher subproc own the lock.
+diff -ruN mailman-2.1.12-a/bin/mmsitepass mailman-2.1.12-b/bin/mmsitepass
+--- mailman-2.1.12-a/bin/mmsitepass	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/mmsitepass	2009-07-28 12:19:54.000000000 +0200
+@@ -43,7 +43,7 @@
+ 
+ import paths
+ from Mailman import Utils
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ PROGRAM = sys.argv[0]
+ 
+@@ -70,34 +70,34 @@
+ 
+     # Defaults
+     siteadmin = 1
+-    pwdesc = _('site')
++    pwdesc = C_('site')
+ 
+     for opt, arg in opts:
+         if opt in ('-h', '--help'):
+             usage(0)
+         elif opt in ('-c', '--listcreator'):
+             siteadmin = 0
+-            pwdesc = _('list creator')
++            pwdesc = C_('list creator')
+ 
+     if len(args) == 1:
+         pw1 = args[0]
+     else:
+         try:
+-            pw1 = getpass.getpass(_('New %(pwdesc)s password: '))
+-            pw2 = getpass.getpass(_('Again to confirm password: '))
++            pw1 = getpass.getpass(C_('New %(pwdesc)s password: '))
++            pw2 = getpass.getpass(C_('Again to confirm password: '))
+             if pw1 <> pw2:
+-                print _('Passwords do not match; no changes made.')
++                print C_('Passwords do not match; no changes made.')
+                 sys.exit(1)
+         except KeyboardInterrupt:
+-            print _('Interrupted...')
++            print C_('Interrupted...')
+             sys.exit(0)
+     # Set the site password by writing it to a local file.  Make sure the
+     # permissions don't allow other+read.
+     Utils.set_global_password(pw1, siteadmin)
+     if Utils.check_global_password(pw1, siteadmin):
+-        print _('Password changed.')
++        print C_('Password changed.')
+     else:
+-        print _('Password change failed.')
++        print C_('Password change failed.')
+ 
+ 
+ 
+diff -ruN mailman-2.1.12-a/bin/newlist mailman-2.1.12-b/bin/newlist
+--- mailman-2.1.12-a/bin/newlist	2009-07-28 12:19:50.000000000 +0200
++++ mailman-2.1.12-b/bin/newlist	2009-07-28 12:19:54.000000000 +0200
+@@ -103,7 +103,7 @@
+ from Mailman import Message
+ from Mailman import i18n
+ 
+-_ = i18n._
++C_ = i18n.C_
+ 
+ PROGRAM = sys.argv[0]
+ 
+@@ -114,7 +114,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+@@ -147,12 +147,12 @@
+ 
+     # Is the language known?
+     if lang not in mm_cfg.LC_DESCRIPTIONS.keys():
+-        usage(1, _('Unknown language: %(lang)s'))
++        usage(1, C_('Unknown language: %(lang)s'))
+ 
+     if len(args) > 0:
+         listname = args[0]
+     else:
+-        listname = raw_input(_('Enter the name of the list: '))
++        listname = raw_input(C_('Enter the name of the list: '))
+     listname = listname.lower()
+ 
+     if '@' in listname:
+@@ -167,22 +167,22 @@
+     web_page_url = mm_cfg.DEFAULT_URL_PATTERN % urlhost
+ 
+     if Utils.list_exists(listname):
+-        usage(1, _('List already exists: %(listname)s'))
++        usage(1, C_('List already exists: %(listname)s'))
+ 
+     if len(args) > 1:
+         owner_mail = args[1]
+     else:
+         owner_mail = raw_input(
+-            _('Enter the email of the person running the list: '))
++            C_('Enter the email of the person running the list: '))
+ 
+     if len(args) > 2:
+         listpasswd = args[2]
+     else:
+-        listpasswd = getpass.getpass(_('Initial %(listname)s password: '))
++        listpasswd = getpass.getpass(C_('Initial %(listname)s password: '))
+     # List passwords cannot be empty
+     listpasswd = listpasswd.strip()
+     if not listpasswd:
+-        usage(1, _('The list password cannot be empty'))
++        usage(1, C_('The list password cannot be empty'))
+ 
+     mlist = MailList.MailList()
+     try:
+@@ -201,11 +201,11 @@
+             finally:
+                 os.umask(oldmask)
+         except Errors.BadListNameError, s:
+-            usage(1, _('Illegal list name: %(s)s'))
++            usage(1, C_('Illegal list name: %(s)s'))
+         except Errors.EmailAddressError, s:
+-            usage(1, _('Bad owner email address: %(s)s'))
++            usage(1, C_('Bad owner email address: %(s)s'))
+         except Errors.MMListAlreadyExistsError:
+-            usage(1, _('List already exists: %(listname)s'))
++            usage(1, C_('List already exists: %(listname)s'))
+ 
+         # Assign domain-specific attributes
+         mlist.host_name = host_name
+@@ -226,7 +226,7 @@
+ 
+     # And send the notice to the list owner
+     if not quiet:
+-        print _('Hit enter to notify %(listname)s owner...'),
++        print C_('Hit enter to notify %(listname)s owner...'),
+         sys.stdin.readline()
+         siteowner = Utils.get_site_email(mlist.host_name, 'owner')
+         text = Utils.maketext(
+diff -ruN mailman-2.1.12-a/bin/qrunner mailman-2.1.12-b/bin/qrunner
+--- mailman-2.1.12-a/bin/qrunner	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/qrunner	2009-07-28 12:19:54.000000000 +0200
+@@ -78,7 +78,7 @@
+ 
+ import paths
+ from Mailman import mm_cfg
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ from Mailman.Logging.Syslog import syslog
+ from Mailman.Logging.Utils import LogStdErr
+ 
+@@ -95,7 +95,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+@@ -175,8 +175,8 @@
+                     name = runnername[:-len('Runner')]
+                 else:
+                     name = runnername
+-                print _('%(name)s runs the %(runnername)s qrunner')
+-            print _('All runs all the above qrunners')
++                print C_('%(name)s runs the %(runnername)s qrunner')
++            print C_('All runs all the above qrunners')
+             sys.exit(0)
+         elif opt in ('-o', '--once'):
+             once = 1
+@@ -212,7 +212,7 @@
+     if len(args) <> 0:
+         usage(1)
+     if len(runners) == 0:
+-        usage(1, _('No runner name given.'))
++        usage(1, C_('No runner name given.'))
+ 
+     # Before we startup qrunners, we redirect the stderr to mailman syslog.
+     # We assume !AS_SUBPROC is running for debugging purpose and don't
+diff -ruN mailman-2.1.12-a/bin/rb-archfix mailman-2.1.12-b/bin/rb-archfix
+--- mailman-2.1.12-a/bin/rb-archfix	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/rb-archfix	2009-07-28 12:19:54.000000000 +0200
+@@ -52,7 +52,7 @@
+ 
+ # Required to get the right classes for unpickling
+ import paths
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ PROGRAM = sys.argv[0]
+ 
+@@ -63,7 +63,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+diff -ruN mailman-2.1.12-a/bin/remove_members mailman-2.1.12-b/bin/remove_members
+--- mailman-2.1.12-a/bin/remove_members	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/remove_members	2009-07-28 12:19:54.000000000 +0200
+@@ -66,7 +66,7 @@
+ from Mailman import MailList
+ from Mailman import Utils
+ from Mailman import Errors
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ try:
+     True, False
+@@ -81,7 +81,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+@@ -153,14 +153,14 @@
+         try:
+             addresses = addresses + ReadFile(filename)
+         except IOError:
+-            print _('Could not open file for reading: %(filename)s.')
++            print C_('Could not open file for reading: %(filename)s.')
+ 
+     for listname in listnames:
+        try:
+            # open locked
+            mlist = MailList.MailList(listname)
+        except Errors.MMListError:
+-           print _('Error opening list %(listname)s... skipping.')
++           print C_('Error opening list %(listname)s... skipping.')
+            continue
+ 
+        if all:
+@@ -170,12 +170,12 @@
+            for addr in addresses:
+                if not mlist.isMember(addr):
+                    if not alllists:
+-                       print _('No such member: %(addr)s')
++                       print C_('No such member: %(addr)s')
+                    continue
+                mlist.ApprovedDeleteMember(addr, 'bin/remove_members',
+                                           admin_notif, userack)
+                if alllists:
+-                   print _("User `%(addr)s' removed from list: %(listname)s.")
++                   print C_("User `%(addr)s' removed from list: %(listname)s.")
+            mlist.Save()
+        finally:
+            mlist.Unlock()
+diff -ruN mailman-2.1.12-a/bin/rmlist mailman-2.1.12-b/bin/rmlist
+--- mailman-2.1.12-a/bin/rmlist	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/rmlist	2009-07-28 12:19:54.000000000 +0200
+@@ -45,7 +45,7 @@
+ from Mailman import mm_cfg
+ from Mailman import Utils
+ from Mailman import MailList
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ try:
+     True, False
+@@ -60,7 +60,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+@@ -69,15 +69,15 @@
+ 
+ def remove_it(listname, filename, msg):
+     if os.path.islink(filename):
+-        print _('Removing %(msg)s')
++        print C_('Removing %(msg)s')
+         os.unlink(filename)
+     elif os.path.isdir(filename):
+-        print _('Removing %(msg)s')
++        print C_('Removing %(msg)s')
+         shutil.rmtree(filename)
+     elif os.path.isfile(filename):
+         os.unlink(filename)
+     else:
+-        print _('%(listname)s %(msg)s not found as %(filename)s')
++        print C_('%(listname)s %(msg)s not found as %(filename)s')
+ 
+ 
+ 
+@@ -101,13 +101,13 @@
+ 
+     if not Utils.list_exists(listname):
+         if not removeArchives:
+-            usage(1, _('No such list (or list already deleted): %(listname)s'))
++            usage(1, C_('No such list (or list already deleted): %(listname)s'))
+         else:
+-            print _(
++            print C_(
+                 'No such list: %(listname)s.  Removing its residual archives.')
+ 
+     if not removeArchives:
+-        print _('Not removing archives.  Reinvoke with -a to remove them.')
++        print C_('Not removing archives.  Reinvoke with -a to remove them.')
+ 
+ 
+     REMOVABLES = []
+@@ -121,7 +121,7 @@
+             sys.modules[modname].remove(mlist)
+ 
+         REMOVABLES = [
+-            (os.path.join('lists', listname), _('list info')),
++            (os.path.join('lists', listname), C_('list info')),
+             ]
+ 
+     # Remove any stale locks associated with the list
+@@ -129,18 +129,18 @@
+         fn_listname = filename.split('.')[0]
+         if fn_listname == listname:
+             REMOVABLES.append((os.path.join(mm_cfg.LOCK_DIR, filename),
+-                               _('stale lock file')))
++                               C_('stale lock file')))
+ 
+     if removeArchives:
+         REMOVABLES.extend([
+             (os.path.join('archives', 'private', listname),
+-             _('private archives')),
++             C_('private archives')),
+             (os.path.join('archives', 'private', listname + '.mbox'),
+-             _('private archives')),
++             C_('private archives')),
+             (os.path.join('archives', 'public', listname),
+-             _('public archives')),
++             C_('public archives')),
+             (os.path.join('archives', 'public', listname + '.mbox'),
+-             _('public archives')),
++             C_('public archives')),
+             ])
+ 
+     for dirtmpl, msg in REMOVABLES:
+diff -ruN mailman-2.1.12-a/bin/show_qfiles mailman-2.1.12-b/bin/show_qfiles
+--- mailman-2.1.12-a/bin/show_qfiles	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/show_qfiles	2009-07-28 12:19:54.000000000 +0200
+@@ -37,7 +37,7 @@
+ from cPickle import load
+ 
+ import paths
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ try:
+     True, False
+@@ -52,7 +52,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+diff -ruN mailman-2.1.12-a/bin/sync_members mailman-2.1.12-b/bin/sync_members
+--- mailman-2.1.12-a/bin/sync_members	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/sync_members	2009-07-28 12:19:54.000000000 +0200
+@@ -86,7 +86,7 @@
+ from Mailman import Errors
+ from Mailman import Utils
+ from Mailman.UserDesc import UserDesc
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ 
+ 
+@@ -97,7 +97,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+@@ -112,7 +112,7 @@
+     elif yesno in ('n', 'no'):
+         return 0
+     else:
+-        usage(1, _('Bad choice: %(yesno)s'))
++        usage(1, C_('Bad choice: %(yesno)s'))
+         # no return
+ 
+ 
+@@ -135,7 +135,7 @@
+         elif opt in ('-n', '--no-change'):
+             dryrun = 1
+             i += 1
+-            print _('Dry run mode')
++            print C_('Dry run mode')
+         elif opt in ('-d', '--digest'):
+             digest = 1
+             i += 1
+@@ -156,11 +156,11 @@
+             i += 1
+         elif opt in ('-f', '--file'):
+             if filename is not None:
+-                usage(1, _('Only one -f switch allowed'))
++                usage(1, C_('Only one -f switch allowed'))
+             try:
+                 filename = sys.argv[i+1]
+             except IndexError:
+-                usage(1, _('No argument to -f given'))
++                usage(1, C_('No argument to -f given'))
+             i += 2
+         elif opt in ('-a', '--notifyadmin'):
+             notifyadmin = 1
+@@ -169,17 +169,17 @@
+             notifyadmin = yesno(opt)
+             i += 1
+         elif opt[0] == '-':
+-            usage(1, _('Illegal option: %(opt)s'))
++            usage(1, C_('Illegal option: %(opt)s'))
+         else:
+             try:
+                 listname = sys.argv[i].lower()
+                 i += 1
+             except IndexError:
+-                usage(1, _('No listname given'))
++                usage(1, C_('No listname given'))
+             break
+ 
+     if listname is None or filename is None:
+-        usage(1, _('Must have a listname and a filename'))
++        usage(1, C_('Must have a listname and a filename'))
+ 
+     # read the list of addresses to sync to from the file
+     if filename == '-':
+@@ -188,7 +188,7 @@
+         try:
+             fp = open(filename)
+         except IOError, (code, msg):
+-            usage(1, _('Cannot read address file: %(filename)s: %(msg)s'))
++            usage(1, C_('Cannot read address file: %(filename)s: %(msg)s'))
+         try:
+             filemembers = fp.readlines()
+         finally:
+@@ -200,7 +200,7 @@
+         addr = filemembers[i].strip()
+         if addr == '' or addr[:1] == '#':
+             del filemembers[i]
+-            print _('Ignore  :  %(addr)30s')
++            print C_('Ignore  :  %(addr)30s')
+ 
+     # first filter out any invalid addresses
+     filemembers = email.Utils.getaddresses(filemembers)
+@@ -209,17 +209,17 @@
+         try:
+             Utils.ValidateEmail(addr)
+         except Errors.EmailAddressError:
+-            print _('Invalid :  %(addr)30s')
++            print C_('Invalid :  %(addr)30s')
+             invalid = 1
+     if invalid:
+-        print _('You must fix the preceding invalid addresses first.')
++        print C_('You must fix the preceding invalid addresses first.')
+         sys.exit(1)
+ 
+     # get the locked list object
+     try:
+         mlist = MailList.MailList(listname)
+     except Errors.MMListError, e:
+-        print _('No such list: %(listname)s')
++        print C_('No such list: %(listname)s')
+         sys.exit(1)
+ 
+     try:
+@@ -241,7 +241,7 @@
+                 needsadding[laddr] = (name, addr)
+ 
+         if not needsadding and not addrs:
+-            print _('Nothing to do.')
++            print C_('Nothing to do.')
+             sys.exit(0)
+ 
+         enc = sys.getdefaultencoding()
+@@ -257,11 +257,11 @@
+                 if not dryrun:
+                     mlist.ApprovedAddMember(userdesc, welcome, notifyadmin)
+                 s = email.Utils.formataddr((name, addr)).encode(enc, 'replace')
+-                print _('Added  : %(s)s')
++                print C_('Added  : %(s)s')
+             except Errors.MMAlreadyAMember:
+                 pass
+             except Errors.MembershipIsBanned, pattern:
+-                print ('%s:' % addr), _('Banned address (matched %(pattern)s)')
++                print ('%s:' % addr), C_('Banned address (matched %(pattern)s)')
+ 
+         for laddr, addr in addrs.items():
+             # Should be a member, otherwise our test above is broken
+@@ -277,7 +277,7 @@
+                     # get rid of this member's entry
+                     mlist.removeMember(addr)
+             s = email.Utils.formataddr((name, addr)).encode(enc, 'replace')
+-            print _('Removed: %(s)s')
++            print C_('Removed: %(s)s')
+ 
+         mlist.Save()
+     finally:
+diff -ruN mailman-2.1.12-a/bin/transcheck mailman-2.1.12-b/bin/transcheck
+--- mailman-2.1.12-a/bin/transcheck	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/transcheck	2009-07-28 12:19:54.000000000 +0200
+@@ -36,7 +36,7 @@
+ import getopt
+ 
+ import paths
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ program = sys.argv[0]
+ 
+@@ -47,7 +47,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+diff -ruN mailman-2.1.12-a/bin/unshunt mailman-2.1.12-b/bin/unshunt
+--- mailman-2.1.12-a/bin/unshunt	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/unshunt	2009-07-28 12:19:54.000000000 +0200
+@@ -38,7 +38,7 @@
+ import paths
+ from Mailman import mm_cfg
+ from Mailman.Queue.sbcache import get_switchboard
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+ 
+ 
+@@ -47,7 +47,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+@@ -82,7 +82,7 @@
+         except Exception, e:
+             # If there are any unshunting errors, log them and continue trying
+             # other shunted messages.
+-            print >> sys.stderr, _(
++            print >> sys.stderr, C_(
+                 'Cannot unshunt message %(filebase)s, skipping:\n%(e)s')
+         else:
+             # Unlink the .bak file left by dequeue()
+diff -ruN mailman-2.1.12-a/bin/update mailman-2.1.12-b/bin/update
+--- mailman-2.1.12-a/bin/update	2009-07-28 12:19:50.000000000 +0200
++++ mailman-2.1.12-b/bin/update	2009-07-28 12:19:54.000000000 +0200
+@@ -51,7 +51,7 @@
+ from Mailman import Message
+ from Mailman import Pending
+ from Mailman.LockFile import TimeOutError
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ from Mailman.Queue.Switchboard import Switchboard
+ from Mailman.OldStyleMemberships import OldStyleMemberships
+ from Mailman.MemberAdaptor import BYBOUNCE, ENABLED
+@@ -103,7 +103,7 @@
+ 
+ def move_language_templates(mlist):
+     listname = mlist.internal_name()
+-    print _('Fixing language templates: %(listname)s')
++    print C_('Fixing language templates: %(listname)s')
+     # Mailman 2.1 has a new cascading search for its templates, defined and
+     # described in Utils.py:maketext().  Putting templates in the top level
+     # templates/ subdir or the lists/<listname> subdir is deprecated and no
+@@ -192,7 +192,7 @@
+     try:
+         mlist.Lock(0.5)
+     except TimeOutError:
+-        print >> sys.stderr, _('WARNING: could not acquire lock for list: '
++        print >> sys.stderr, C_('WARNING: could not acquire lock for list: '
+                                '%(listname)s')
+         return 1
+ 
+@@ -211,13 +211,13 @@
+         # re-disable them if necessary.
+         n = len(noinfo)
+         if n > 0:
+-            print _(
++            print C_(
+                 'Resetting %(n)s BYBOUNCEs disabled addrs with no bounce info')
+             for addr in noinfo.keys():
+                 mlist.setDeliveryStatus(addr, ENABLED)
+ 
+     # Update the held requests database
+-    print _("""Updating the held requests database.""")
++    print C_("""Updating the held requests database.""")
+     mlist._UpdateRecords()
+ 
+     mbox_dir = make_varabs('archives/private/%s.mbox' % (listname))
+@@ -239,7 +239,7 @@
+     else:
+         # this shouldn't happen, but hey, just in case
+         if not os.path.isdir(mbox_dir):
+-            print _("""\
++            print C_("""\
+ For some reason, %(mbox_dir)s exists as a file.  This won't work with
+ b6, so I'm renaming it to %(mbox_dir)s.tmp and proceeding.""")
+             os.rename(mbox_dir, "%s.tmp" % (mbox_dir))
+@@ -251,7 +251,7 @@
+     # private one existing
+     if os.path.isfile(o_pri_mbox_file) and os.path.isfile(o_pub_mbox_file):
+         if mlist.archive_private:
+-            print _("""\
++            print C_("""\
+ 
+ %(listname)s has both public and private mbox archives.  Since this list
+ currently uses private archiving, I'm installing the private mbox archive
+@@ -266,7 +266,7 @@
+         o_pub_mbox_file)
+             os.rename(o_pub_mbox_file, "%s.preb6" % (o_pub_mbox_file))
+         else:
+-            print _("""\
++            print C_("""\
+ %s has both public and private mbox archives.  Since this list
+ currently uses public archiving, I'm installing the public mbox file
+ archive file (%s) as the active one, and renaming
+@@ -283,7 +283,7 @@
+     # move private archive mbox there if it's around
+     # and take into account all sorts of absurdities
+     #
+-    print _('- updating old private mbox file')
++    print C_('- updating old private mbox file')
+     if os.path.exists(o_pri_mbox_file):
+         if os.path.isfile(o_pri_mbox_file):
+             os.rename(o_pri_mbox_file, mbox_file)
+@@ -291,14 +291,14 @@
+             newname = "%s.mm_install-dunno_what_this_was_but_its_in_the_way" \
+                       % o_pri_mbox_file
+             os.rename(o_pri_mbox_file, newname)
+-            print _("""\
++            print C_("""\
+     unknown file in the way, moving
+         %(o_pri_mbox_file)s
+     to
+         %(newname)s""")
+         else:
+             # directory
+-            print _("""\
++            print C_("""\
+     looks like you have a really recent CVS installation...
+     you're either one brave soul, or you already ran me""")
+ 
+@@ -307,7 +307,7 @@
+     # move public archive mbox there if it's around
+     # and take into account all sorts of absurdities.
+     #
+-    print _('- updating old public mbox file')
++    print C_('- updating old public mbox file')
+     if os.path.exists(o_pub_mbox_file):
+         if os.path.isfile(o_pub_mbox_file):
+             os.rename(o_pub_mbox_file, mbox_file)
+@@ -315,13 +315,13 @@
+             newname = "%s.mm_install-dunno_what_this_was_but_its_in_the_way" \
+                       % o_pub_mbox_file
+             os.rename(o_pub_mbox_file, newname)
+-            print _("""\
++            print C_("""\
+     unknown file in the way, moving
+         %(o_pub_mbox_file)s
+     to
+         %(newname)s""")
+         else: # directory
+-            print _("""\
++            print C_("""\
+     looks like you have a really recent CVS installation...
+     you're either one brave soul, or you already ran me""")
+ 
+@@ -353,7 +353,7 @@
+         b4_tmpl_dir = os.path.join(tmpl_dir, mlist._internal_name)
+         new_tmpl_dir = os.path.join(list_dir, mlist._internal_name)
+         if os.path.exists(b4_tmpl_dir):
+-            print _("""\
++            print C_("""\
+ - This list looks like it might have <= b4 list templates around""")
+             for f in os.listdir(b4_tmpl_dir):
+                 o_tmpl = os.path.join(b4_tmpl_dir, f)
+@@ -361,12 +361,12 @@
+                 if os.path.exists(o_tmpl):
+                     if not os.path.exists(n_tmpl):
+                         os.rename(o_tmpl, n_tmpl)
+-                        print _('- moved %(o_tmpl)s to %(n_tmpl)s')
++                        print C_('- moved %(o_tmpl)s to %(n_tmpl)s')
+                     else:
+-                        print _("""\
++                        print C_("""\
+ - both %(o_tmpl)s and %(n_tmpl)s exist, leaving untouched""")
+                 else:
+-                    print _("""\
++                    print C_("""\
+ - %(o_tmpl)s doesn't exist, leaving untouched""")
+     #
+     # Move all the templates to the en language subdirectory as required for
+@@ -396,23 +396,23 @@
+     src = '%s/%s' % (mm_cfg.PREFIX, module)
+     pyc = src + "c"
+     if os.path.isdir(src):
+-        print _('removing directory %(src)s and everything underneath')
++        print C_('removing directory %(src)s and everything underneath')
+         shutil.rmtree(src)
+     elif os.path.exists(src):
+-        print _('removing %(src)s')
++        print C_('removing %(src)s')
+         try:
+             os.unlink(src)
+         except os.error, rest:
+-            print _("Warning: couldn't remove %(src)s -- %(rest)s")
++            print C_("Warning: couldn't remove %(src)s -- %(rest)s")
+     if module.endswith('.py') and os.path.exists(pyc):
+         try:
+             os.unlink(pyc)
+         except os.error, rest:
+-            print _("couldn't remove old file %(pyc)s -- %(rest)s")
++            print C_("couldn't remove old file %(pyc)s -- %(rest)s")
+ 
+ 
+ def update_qfiles():
+-    print _('updating old qfiles')
++    print C_('updating old qfiles')
+     prefix = `time.time()` + '+'
+     # Be sure the qfiles/in directory exists (we don't really need the
+     # switchboard object, but it's convenient for creating the directory).
+@@ -524,7 +524,7 @@
+                 # This message was unparsable, most likely because its
+                 # MIME encapsulation was broken.  For now, there's not
+                 # much we can do about it.
+-                print _('message is unparsable: %(filebase)s')
++                print C_('message is unparsable: %(filebase)s')
+                 msgfp.close()
+                 msgfp = None
+                 if mm_cfg.QRUNNER_SAVE_BAD_MESSAGES:
+@@ -557,7 +557,7 @@
+     except IOError, e:
+         if e.errno <> errno.ENOENT: raise
+     else:
+-        print _('Updating Mailman 2.0 pending_subscriptions.db database')
++        print C_('Updating Mailman 2.0 pending_subscriptions.db database')
+         db = marshal.load(fp)
+         # Convert to the pre-Mailman 2.1.5 format
+         db = Pending._update(db)
+@@ -568,10 +568,10 @@
+         except IOError, e:
+             if e.errno <> errno.ENOENT: raise
+         else:
+-            print _('Updating Mailman 2.1.4 pending.pck database')
++            print C_('Updating Mailman 2.1.4 pending.pck database')
+             db = cPickle.load(fp)
+     if db is None:
+-        print _('Nothing to do.')
++        print C_('Nothing to do.')
+         return
+     # Now upgrade the database to the 2.1.5 format.  Each list now has its own
+     # pending.pck file, but only the RE_ENABLE operation actually recorded the
+@@ -592,7 +592,7 @@
+             op = val[0]
+             data = val[1:]
+         except (IndexError, ValueError):
+-            print _('Ignoring bad pended data: %(key)s: %(val)s')
++            print C_('Ignoring bad pended data: %(key)s: %(val)s')
+             continue
+         if op in (Pending.UNSUBSCRIPTION, Pending.CHANGE_OF_ADDRESS):
+             # data[0] is the address being unsubscribed
+@@ -608,7 +608,7 @@
+             # data[0] is the hold id.  There better only be one entry per id
+             id = data[0]
+             if holds_by_id.has_key(id):
+-                print _('WARNING: Ignoring duplicate pending ID: %(id)s.')
++                print C_('WARNING: Ignoring duplicate pending ID: %(id)s.')
+             else:
+                 holds_by_id[id] = (key, val)
+     # Now we have to lock every list and re-pend all the appropriate
+@@ -661,7 +661,7 @@
+ def main():
+     errors = 0
+     # get rid of old stuff
+-    print _('getting rid of old source files')
++    print C_('getting rid of old source files')
+     for mod in ('Mailman/Archiver.py', 'Mailman/HyperArch.py',
+                 'Mailman/HyperDatabase.py', 'Mailman/pipermail.py',
+                 'Mailman/smtplib.py', 'Mailman/Cookie.py',
+@@ -671,29 +671,29 @@
+         remove_old_sources(mod)
+     listnames = Utils.list_names()
+     if not listnames:
+-        print _('no lists == nothing to do, exiting')
++        print C_('no lists == nothing to do, exiting')
+         return
+     #
+     # for people with web archiving, make sure the directories
+     # in the archiving are set with proper perms for b6.
+     #
+     if os.path.isdir("%s/public_html/archives" % mm_cfg.PREFIX):
+-        print _("""\
++        print C_("""\
+ fixing all the perms on your old html archives to work with b6
+ If your archives are big, this could take a minute or two...""")
+         os.path.walk("%s/public_html/archives" % mm_cfg.PREFIX,
+                      archive_path_fixer, "")
+-        print _('done')
++        print C_('done')
+     for listname in listnames:
+-        print _('Updating mailing list: %(listname)s')
++        print C_('Updating mailing list: %(listname)s')
+         errors = errors + dolist(listname)
+         print
+-    print _('Updating Usenet watermarks')
++    print C_('Updating Usenet watermarks')
+     wmfile = os.path.join(mm_cfg.DATA_DIR, 'gate_watermarks')
+     try:
+         fp = open(wmfile)
+     except IOError:
+-        print _('- nothing to update here')
++        print C_('- nothing to update here')
+     else:
+         d = marshal.load(fp)
+         fp.close()
+@@ -705,7 +705,7 @@
+             try:
+                 mlist.Lock(0.5)
+             except TimeOutError:
+-                print >> sys.stderr, _(
++                print >> sys.stderr, C_(
+                     'WARNING: could not acquire lock for list: %(listname)s')
+                 errors = errors + 1
+             else:
+@@ -716,7 +716,7 @@
+                 mlist.Save()
+                 mlist.Unlock()
+         os.unlink(wmfile)
+-        print _('- usenet watermarks updated and gate_watermarks removed')
++        print C_('- usenet watermarks updated and gate_watermarks removed')
+     # In Mailman 2.1, the pending database format and file name changed, but
+     # in Mailman 2.1.5 it changed again.  This should update all existing
+     # files to the 2.1.5 format.
+@@ -730,7 +730,7 @@
+     # There's no good way of figuring this out for releases prior to 2.0beta2
+     # :(
+     if lastversion == NOTFRESH:
+-        print _("""
++        print C_("""
+ 
+ NOTE NOTE NOTE NOTE NOTE
+ 
+@@ -757,7 +757,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__) % globals()
++    print >> fd, C_(__doc__) % globals()
+     if msg:
+         print >> sys.stderr, msg
+     sys.exit(code)
+@@ -787,15 +787,15 @@
+     hextversion = hex(thisversion)
+     if lastversion == thisversion and not force:
+         # nothing to do
+-        print _('No updates are necessary.')
++        print C_('No updates are necessary.')
+         sys.exit(0)
+     if lastversion > thisversion and not force:
+-        print _("""\
++        print C_("""\
+ Downgrade detected, from version %(hexlversion)s to version %(hextversion)s
+ This is probably not safe.
+ Exiting.""")
+         sys.exit(1)
+-    print _('Upgrading from version %(hexlversion)s to %(hextversion)s')
++    print C_('Upgrading from version %(hexlversion)s to %(hextversion)s')
+     errors = main()
+     if not errors:
+         # Record the version we just upgraded to
+@@ -804,7 +804,7 @@
+         fp.close()
+     else:
+         lockdir = mm_cfg.LOCK_DIR
+-        print _('''\
++        print C_('''\
+ 
+ ERROR:
+ 
+diff -ruN mailman-2.1.12-a/bin/version mailman-2.1.12-b/bin/version
+--- mailman-2.1.12-a/bin/version	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/version	2009-07-28 12:19:54.000000000 +0200
+@@ -21,6 +21,6 @@
+ 
+ import paths
+ import Mailman.mm_cfg
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ 
+-print _('Using Mailman version:'), Mailman.mm_cfg.VERSION
++print C_('Using Mailman version:'), Mailman.mm_cfg.VERSION
+diff -ruN mailman-2.1.12-a/bin/withlist mailman-2.1.12-b/bin/withlist
+--- mailman-2.1.12-a/bin/withlist	2009-07-28 12:19:51.000000000 +0200
++++ mailman-2.1.12-b/bin/withlist	2009-07-28 12:19:54.000000000 +0200
+@@ -157,7 +157,7 @@
+         fd = sys.stderr
+     else:
+         fd = sys.stdout
+-    print >> fd, _(__doc__)
++    print >> fd, C_(__doc__)
+     if msg:
+         print >> fd, msg
+     sys.exit(code)
+@@ -175,11 +175,11 @@
+     if m.Locked():
+         if VERBOSE:
+             listname = m.internal_name()
+-            print >> sys.stderr, _(
++            print >> sys.stderr, C_(
+                 'Unlocking (but not saving) list: %(listname)s')
+         m.Unlock()
+     if VERBOSE:
+-        print >> sys.stderr, _('Finalizing')
++        print >> sys.stderr, C_('Finalizing')
+     del m
+ 
+ 
+@@ -188,16 +188,16 @@
+     global m
+     # first try to open mailing list
+     if VERBOSE:
+-        print >> sys.stderr, _('Loading list %(listname)s'),
++        print >> sys.stderr, C_('Loading list %(listname)s'),
+         if LOCK:
+-            print >> sys.stderr, _('(locked)')
++            print >> sys.stderr, C_('(locked)')
+         else:
+-            print >> sys.stderr, _('(unlocked)')
++            print >> sys.stderr, C_('(unlocked)')
+ 
+     try:
+         m = MailList.MailList(listname, lock=LOCK)
+     except Errors.MMUnknownListError:
+-        print >> sys.stderr, _('Unknown list: %(listname)s')
++        print >> sys.stderr, C_('Unknown list: %(listname)s')
+         m = None
+ 
+     # try to import the module and run the callable
+@@ -237,7 +237,7 @@
+             all = True
+ 
+     if len(args) < 1 and not all:
+-        warning = _('No list name supplied.')
++        warning = C_('No list name supplied.')
+         if interact:
+             # Let them keep going
+             print warning
+@@ -246,7 +246,7 @@
+             usage(1, warning)
+ 
+     if all and not run:
+-        usage(1, _('--all requires --run'))
++        usage(1, C_('--all requires --run'))
+ 
+     # The default for interact is 1 unless -r was given
+     if interact is None:
+@@ -266,11 +266,11 @@
+             module = run[:i]
+             callable = run[i+1:]
+         if VERBOSE:
+-            print >> sys.stderr, _('Importing %(module)s...')
++            print >> sys.stderr, C_('Importing %(module)s...')
+         __import__(module)
+         mod = sys.modules[module]
+         if VERBOSE:
+-            print >> sys.stderr, _('Running %(module)s.%(callable)s()...')
++            print >> sys.stderr, C_('Running %(module)s.%(callable)s()...')
+         func = getattr(mod, callable)
+ 
+     if all:
+@@ -291,7 +291,7 @@
+         namespace = globals().copy()
+         namespace.update(locals())
+         if dolist:
+-            ban = _("The variable `m' is the %(listname)s MailList instance")
++            ban = C_("The variable `m' is the %(listname)s MailList instance")
+         else:
+             ban = None
+         code.InteractiveConsole(namespace).interact(ban)
+diff -ruN mailman-2.1.12-a/Mailman/i18n.py mailman-2.1.12-b/Mailman/i18n.py
+--- mailman-2.1.12-a/Mailman/i18n.py	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/Mailman/i18n.py	2009-07-28 12:19:54.000000000 +0200
+@@ -15,6 +15,7 @@
+ # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
+ # USA.
+ 
++import locale
+ import sys
+ import time
+ import gettext
+@@ -26,6 +27,16 @@
+ _translation = None
+ 
+ 
++def _get_ctype_charset():
++    old = locale.setlocale(locale.LC_CTYPE, '')
++    charset = locale.nl_langinfo(locale.CODESET)
++    locale.setlocale(locale.LC_CTYPE, old)
++    return charset
++
++_ctype_charset = _get_ctype_charset()
++
++
++
+ 
+ def set_language(language=None):
+     global _translation
+@@ -54,7 +65,7 @@
+ 
+ 
+ 
+-def _(s):
++def _(s, frame = 1):
+     if s == '':
+         return s
+     assert s
+@@ -70,7 +81,7 @@
+     # original string is 1) locals dictionary, 2) globals dictionary.
+     #
+     # First, get the frame of the caller
+-    frame = sys._getframe(1)
++    frame = sys._getframe(frame)
+     # A `safe' dictionary is used so we won't get an exception if there's a
+     # missing key in the dictionary.
+     dict = SafeDict(frame.f_globals.copy())
+@@ -88,6 +99,21 @@
+         if isinstance(v, UnicodeType):
+             dict[k] = v.encode(charset, 'replace')
+     return tns % dict
++    
++    
++def tolocale(s):
++    global _ctype_charset
++    if isinstance(s, UnicodeType):
++        return s
++    source = _translation.charset ()
++    if not source:
++        return s
++    return unicode(s, source, 'replace').encode(_ctype_charset, 'replace')
++
++def C_(s):
++    return tolocale(_(s, 2))
++    
++
+ 
+ 
+ 
+diff -ruN mailman-2.1.12-a/Mailman/MTA/Postfix.py mailman-2.1.12-b/Mailman/MTA/Postfix.py
+--- mailman-2.1.12-a/Mailman/MTA/Postfix.py	2009-07-28 12:19:50.000000000 +0200
++++ mailman-2.1.12-b/Mailman/MTA/Postfix.py	2009-07-28 12:19:54.000000000 +0200
+@@ -27,7 +27,7 @@
+ from Mailman import mm_cfg
+ from Mailman import Utils
+ from Mailman import LockFile
+-from Mailman.i18n import _
++from Mailman.i18n import C_
+ from Mailman.MTA.Utils import makealiases
+ from Mailman.Logging.Syslog import syslog
+ 
+@@ -308,7 +308,7 @@
+     targetmode = S_IFREG | S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP
+     for file in ALIASFILE, VIRTFILE:
+         if state.VERBOSE:
+-            print _('checking permissions on %(file)s')
++            print C_('checking permissions on %(file)s')
+         stat = None
+         try:
+             stat = os.stat(file)
+@@ -318,9 +318,9 @@
+         if stat and (stat[ST_MODE] & targetmode) <> targetmode:
+             state.ERRORS += 1
+             octmode = oct(stat[ST_MODE])
+-            print _('%(file)s permissions must be 066x (got %(octmode)s)'),
++            print C_('%(file)s permissions must be 066x (got %(octmode)s)'),
+             if state.FIX:
+-                print _('(fixing)')
++                print C_('(fixing)')
+                 os.chmod(file, stat[ST_MODE] | targetmode)
+             else:
+                 print
+@@ -336,7 +336,7 @@
+                 raise
+             continue
+         if state.VERBOSE:
+-            print _('checking ownership of %(dbfile)s')
++            print C_('checking ownership of %(dbfile)s')
+         user = mm_cfg.MAILMAN_USER
+         ownerok = stat[ST_UID] == pwd.getpwnam(user)[2]
+         if not ownerok:
+@@ -344,10 +344,10 @@
+                 owner = pwd.getpwuid(stat[ST_UID])[0]
+             except KeyError:
+                 owner = 'uid %d' % stat[ST_UID]
+-            print _('%(dbfile)s owned by %(owner)s (must be owned by %(user)s'),
++            print C_('%(dbfile)s owned by %(owner)s (must be owned by %(user)s'),
+             state.ERRORS += 1
+             if state.FIX:
+-                print _('(fixing)')
++                print C_('(fixing)')
+                 uid = pwd.getpwnam(user)[2]
+                 gid = grp.getgrnam(mm_cfg.MAILMAN_GROUP)[2]
+                 os.chown(dbfile, uid, gid)

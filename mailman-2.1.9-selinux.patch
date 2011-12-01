@@ -1,0 +1,47 @@
+diff -ruN mailman-2.1.12-a/misc/mailman.in mailman-2.1.12-b/misc/mailman.in
+--- mailman-2.1.12-a/misc/mailman.in	2009-07-28 12:19:49.000000000 +0200
++++ mailman-2.1.12-b/misc/mailman.in	2009-07-28 12:19:53.000000000 +0200
+@@ -32,7 +32,6 @@
+ # config: @prefix@/Mailman/mm_cfg.py
+ # pidfile: @PID_DIR@/master-qrunner.pid
+ 
+-PYTHON=@PYTHON@
+ MAILMANHOME=@prefix@
+ MAILMANCTL=$MAILMANHOME/bin/mailmanctl
+ 
+@@ -75,7 +74,7 @@
+ function start()
+ {
+     echo -n $"Starting $prog: "
+-    daemon $PYTHON $MAILMANCTL -s -q start
++    daemon $MAILMANCTL -s -q start
+     RETVAL=$?
+     if [ $RETVAL -eq 0 ]
+     then
+@@ -89,7 +88,7 @@
+ function stop()
+ {
+     echo -n $"Shutting down $prog: "
+-    daemon $PYTHON $MAILMANCTL -q stop
++    daemon $MAILMANCTL -q stop
+     RETVAL=$?
+     if [ $RETVAL -eq 0 ]
+     then
+@@ -125,7 +124,7 @@
+     ;;
+ 
+ 'condrestart')
+-    $PYTHON $MAILMANCTL -q -u status
++    $MAILMANCTL -q -u status
+     retval=$?
+     if [ $retval -eq 0 ]
+     then
+@@ -135,7 +134,7 @@
+     ;;
+ 
+ 'status')
+-    $PYTHON $MAILMANCTL -u status
++    $MAILMANCTL -u status
+     RETVAL=$?
+     ;;
+ 

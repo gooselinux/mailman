@@ -1,0 +1,201 @@
+diff -ruN mailman-2.1.12-a/bin/check_perms mailman-2.1.12-b/bin/check_perms
+--- mailman-2.1.12-a/bin/check_perms	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/bin/check_perms	2009-07-28 12:19:49.000000000 +0200
+@@ -183,7 +183,8 @@
+         print _('checking mode for %(prefix)s')
+     dirs = {}
+     for d in (mm_cfg.PREFIX, mm_cfg.EXEC_PREFIX, mm_cfg.VAR_PREFIX,
+-              mm_cfg.LOG_DIR):
++              mm_cfg.CONFIG_DIR, mm_cfg.DATA_DIR, mm_cfg.LOCK_DIR,
++              mm_cfg.LOG_DIR, mm_cfg.QUEUE_DIR, mm_cfg.PID_DIR):
+         dirs[d] = True
+     for d in dirs.keys():
+         try:
+diff -ruN mailman-2.1.12-a/configure.in mailman-2.1.12-b/configure.in
+--- mailman-2.1.12-a/configure.in	2009-07-28 12:19:47.000000000 +0200
++++ mailman-2.1.12-b/configure.in	2009-07-28 12:19:49.000000000 +0200
+@@ -248,6 +248,62 @@
+     prefixcheck=$VAR_PREFIX
+ fi
+ 
++# Get the configuration file directory
++AC_SUBST(CONFIG_DIR)
++AC_MSG_CHECKING(for --with-config-dir)
++AC_ARG_WITH(config-dir, dnl
++[  --with-config-dir    specify directory for configuration data other than [VAR_]PREFIX/data])
++case "$with_config_dir" in
++    yes|no|"") CONFIG_DIR="$VAR_PREFIX/data";;
++    *)         CONFIG_DIR=$with_config_dir;;
++esac
++AC_MSG_RESULT($CONFIG_DIR)
++
++# Get the lock directory
++AC_SUBST(LOCK_DIR)
++AC_MSG_CHECKING(for --with-lock-dir)
++AC_ARG_WITH(lock-dir, dnl
++[  --with-lock-dir    specify directory for lock files other than [VAR_]PREFIX/locks])
++case "$with_lock_dir" in
++    yes|no|"") LOCK_DIR="$VAR_PREFIX/locks";;
++    *)         LOCK_DIR=$with_lock_dir;;
++esac
++AC_MSG_RESULT($LOCK_DIR)
++
++# Get the log directory
++AC_SUBST(LOG_DIR)
++AC_MSG_CHECKING(for --with-log-dir)
++AC_ARG_WITH(log-dir, dnl
++[  --with-log-dir    specify directory for log files other than [VAR_]PREFIX/logs])
++case "$with_log_dir" in
++    yes|no|"") LOG_DIR="$VAR_PREFIX/logs";;
++    *)         LOG_DIR=$with_log_dir;;
++esac
++AC_MSG_RESULT($LOG_DIR)
++
++# Get the pid directory
++AC_SUBST(PID_DIR)
++AC_MSG_CHECKING(for --with-pid-dir)
++AC_ARG_WITH(pid-dir, dnl
++[  --with-pid-dir    specify directory for the pid file other than [VAR_]PREFIX/data])
++case "$with_pid_dir" in
++    yes|no|"") PID_DIR="$VAR_PREFIX/data";;
++    *)         PID_DIR=$with_pid_dir;;
++esac
++AC_MSG_RESULT($PID_DIR)
++
++# Get the queue directory
++AC_SUBST(QUEUE_DIR)
++AC_MSG_CHECKING(for --with-queue-dir)
++AC_ARG_WITH(queue-dir, dnl
++[  --with-queue-dir    specify directory for queue files other than [VAR_]PREFIX/qfiles])
++case "$with_queue_dir" in
++    yes|no|"") QUEUE_DIR="$VAR_PREFIX/qfiles";;
++    *)         QUEUE_DIR=$with_queue_dir;;
++esac
++AC_MSG_RESULT($QUEUE_DIR)
++
++
+ # new macro for finding group names
+ # returns a comma separated list of quoted group names
+ # the list is returned in the same order as specified with any duplicates removed
+diff -ruN mailman-2.1.12-a/Mailman/Defaults.py.in mailman-2.1.12-b/Mailman/Defaults.py.in
+--- mailman-2.1.12-a/Mailman/Defaults.py.in	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/Mailman/Defaults.py.in	2009-07-28 12:19:49.000000000 +0200
+@@ -1325,9 +1325,11 @@
+ 
+ # Useful directories
+ LIST_DATA_DIR   = os.path.join(VAR_PREFIX, 'lists')
+-LOG_DIR         = os.path.join(VAR_PREFIX, 'logs')
+-LOCK_DIR        = os.path.join(VAR_PREFIX, 'locks')
++LOG_DIR         = '@LOG_DIR@'
++LOCK_DIR        = '@LOCK_DIR@'
++CONFIG_DIR      = '@CONFIG_DIR@'
+ DATA_DIR        = os.path.join(VAR_PREFIX, 'data')
++PID_DIR         = '@PID_DIR@'
+ SPAM_DIR        = os.path.join(VAR_PREFIX, 'spam')
+ WRAPPER_DIR     = os.path.join(EXEC_PREFIX, 'mail')
+ BIN_DIR         = os.path.join(PREFIX, 'bin')
+@@ -1338,7 +1340,7 @@
+ PRIVATE_ARCHIVE_FILE_DIR = os.path.join(VAR_PREFIX, 'archives', 'private')
+ 
+ # Directories used by the qrunner subsystem
+-QUEUE_DIR       = os.path.join(VAR_PREFIX, 'qfiles')
++QUEUE_DIR       = '@QUEUE_DIR@'
+ INQUEUE_DIR     = os.path.join(QUEUE_DIR, 'in')
+ OUTQUEUE_DIR    = os.path.join(QUEUE_DIR, 'out')
+ CMDQUEUE_DIR    = os.path.join(QUEUE_DIR, 'commands')
+@@ -1352,9 +1354,9 @@
+ MAILDIR_DIR     = os.path.join(QUEUE_DIR, 'maildir')
+ 
+ # Other useful files
+-PIDFILE = os.path.join(DATA_DIR, 'master-qrunner.pid')
+-SITE_PW_FILE = os.path.join(DATA_DIR, 'adm.pw')
+-LISTCREATOR_PW_FILE = os.path.join(DATA_DIR, 'creator.pw')
++PIDFILE = os.path.join(PID_DIR, 'master-qrunner.pid')
++SITE_PW_FILE = os.path.join(CONFIG_DIR, 'adm.pw')
++LISTCREATOR_PW_FILE = os.path.join(CONFIG_DIR, 'creator.pw')
+ 
+ # Import a bunch of version numbers
+ from Version import *
+diff -ruN mailman-2.1.12-a/Mailman/MTA/Postfix.py mailman-2.1.12-b/Mailman/MTA/Postfix.py
+--- mailman-2.1.12-a/Mailman/MTA/Postfix.py	2009-02-23 22:23:35.000000000 +0100
++++ mailman-2.1.12-b/Mailman/MTA/Postfix.py	2009-07-28 12:19:49.000000000 +0200
+@@ -32,8 +32,8 @@
+ from Mailman.Logging.Syslog import syslog
+ 
+ LOCKFILE = os.path.join(mm_cfg.LOCK_DIR, 'creator')
+-ALIASFILE = os.path.join(mm_cfg.DATA_DIR, 'aliases')
+-VIRTFILE = os.path.join(mm_cfg.DATA_DIR, 'virtual-mailman')
++ALIASFILE = os.path.join(mm_cfg.CONFIG_DIR, 'aliases')
++VIRTFILE = os.path.join(mm_cfg.CONFIG_DIR, 'virtual-mailman')
+ 
+ try:
+     True, False
+diff -ruN mailman-2.1.12-a/Makefile.in mailman-2.1.12-b/Makefile.in
+--- mailman-2.1.12-a/Makefile.in	2009-07-28 12:19:48.000000000 +0200
++++ mailman-2.1.12-b/Makefile.in	2009-07-28 12:19:49.000000000 +0200
+@@ -28,6 +28,11 @@
+ prefix=		@prefix@
+ exec_prefix=	@exec_prefix@
+ var_prefix=	@VAR_PREFIX@
++configdir=	@CONFIG_DIR@
++lockdir=	@LOCK_DIR@
++logdir=		@LOG_DIR@
++piddir=		@PID_DIR@
++queuedir=	@QUEUE_DIR@
+ DESTDIR=
+ 
+ CC=		@CC@
+@@ -41,8 +46,11 @@
+ OPT=		@OPT@
+ CFLAGS=		@CFLAGS@ $(OPT) $(DEFS)
+ 
++FHS_DIRS= \
++	${configdir} ${lockdir} ${logdir} ${piddir} ${queuedir}
++
+ VAR_DIRS= \
+-	logs archives lists locks data spam qfiles \
++	archives lists data spam \
+ 	archives/private archives/public
+ 
+ ARCH_INDEP_DIRS= \
+@@ -105,6 +113,15 @@
+ 	    else true; \
+ 	    fi; \
+ 	done
++	@for d in $(FHS_DIRS); \
++	do \
++	    dir=$(DESTDIR)/$$d; \
++	    if test ! -d $$dir; then \
++		echo "Creating directory $$dir"; \
++		$(INSTALL) -d -m $(DIRMODE) $$dir; \
++	    else true; \
++	    fi; \
++	done
+ 	chmod o-r $(DESTDIR)$(var_prefix)/archives/private
+ 	@for d in $(ARCH_INDEP_DIRS); \
+ 	do \
+diff -ruN mailman-2.1.12-a/misc/Makefile.in mailman-2.1.12-b/misc/Makefile.in
+--- mailman-2.1.12-a/misc/Makefile.in	2009-07-28 12:19:48.000000000 +0200
++++ mailman-2.1.12-b/misc/Makefile.in	2009-07-28 12:19:49.000000000 +0200
+@@ -27,6 +27,12 @@
+ prefix=   	@prefix@
+ exec_prefix=	@exec_prefix@
+ var_prefix=	@VAR_PREFIX@
++configdir=	@CONFIG_DIR@
++lockdir=	@LOCK_DIR@
++logdir=		@LOG_DIR@
++piddir=		@PID_DIR@
++queuedir=	@QUEUE_DIR@
++MAILMAN_GROUP=  @MAILMAN_GROUP@
+ DESTDIR=
+ 
+ CC=		@CC@
+@@ -87,7 +93,7 @@
+ 	    $(INSTALL) -m $(FILEMODE) paths.py $$dir; \
+ 	done
+ 	$(INSTALL) -m $(EXEMODE) mailman $(DESTDIR)$(SCRIPTSDIR)
+-	$(INSTALL) -m $(FILEMODE) sitelist.cfg $(DESTDIR)$(DATADIR)
++	$(INSTALL) -m $(FILEMODE) sitelist.cfg $(DESTDIR)$(configdir)
+ 
+ install-packages:
+ 	if [ -z "$(EMAILPKG)" -a -d $(PYTHONLIBDIR)/email ] ; \

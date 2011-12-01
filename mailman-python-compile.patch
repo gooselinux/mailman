@@ -1,0 +1,12 @@
+diff -ruN mailman-2.1.12-a/Makefile.in mailman-2.1.12-b/Makefile.in
+--- mailman-2.1.12-a/Makefile.in	2009-07-28 12:19:49.000000000 +0200
++++ mailman-2.1.12-b/Makefile.in	2009-07-28 12:19:49.000000000 +0200
+@@ -146,7 +146,7 @@
+ 	do \
+ 	    (cd $$d; $(MAKE) DESTDIR=$(DESTDIR) install); \
+ 	done
+-	$(PYTHON) -c 'from compileall import *; compile_dir("$(DESTDIR)$(prefix)/Mailman")'
++	$(PYTHON) -c 'from compileall import *; compile_dir("$(DESTDIR)$(prefix)", 20, "$(prefix)", 1)'
+ 
+ # Only run bin/update if we aren't installing in DESTDIR, as this
+ # means there are probably no lists to deal with, and it wouldn't

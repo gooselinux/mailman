@@ -1,0 +1,13 @@
+diff -up mailman-2.1.12/misc/mailman.in.not-on mailman-2.1.12/misc/mailman.in
+--- mailman-2.1.12/misc/mailman.in.not-on	2009-12-22 13:09:58.000000000 +0100
++++ mailman-2.1.12/misc/mailman.in	2009-12-22 13:10:28.000000000 +0100
+@@ -36,8 +36,7 @@
+ # Required-Start: $local_fs $remote_fs $network $named
+ # Should-Start: httpd
+ # Required-Stop: $local_fs $remote_fs $network
+-# Default-Start: 3 4 5
+-# Default-Stop: 0 1 6
++# Default-Stop: 0 1 3 4 5 6
+ # Short-Description: start and stop Mailman
+ # Description: Mailman is the GNU mailing list manager.
+ ### END INIT INFO
