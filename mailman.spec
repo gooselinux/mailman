@@ -1,7 +1,7 @@
 Summary: Mailing list manager with built in Web access
 Name: mailman
 Version: 2.1.12
-Release: 14%{?dist}
+Release: 14%{?dist}.2
 Epoch: 3
 Group: Applications/Internet
 Source0: ftp://ftp.gnu.org/pub/gnu/mailman/mailman-%{version}.tgz
@@ -41,6 +41,8 @@ Patch19: mailman-2.1.12-codage.patch
 # the service is now off by default
 Patch20: mailman-2.1.12-init-not-on.patch
 Patch21: mailman-2.1.12-shebang.patch
+Patch22: mailman-2.1.9-CVE-2010-3089.patch
+Patch23: mailman-2.1.9-CVE-2011-0707.patch
 
 
 License: GPLv2+
@@ -136,6 +138,8 @@ additional installation steps, these are described in:
 %patch19 -p1
 %patch20 -p1
 %patch21 -p1 -b .shebang
+%patch22 -b .CVE-2010-3089
+%patch23 -b .CVE-2011-0707
 
 # Replaces original email-2.5.8.tar.gz with the patched one
 cp %{SOURCE9} misc/email-2.5.8.tar.gz
@@ -499,7 +503,7 @@ exit 0
 /etc/smrsh/%{mail_wrapper}
 %dir %attr(2775,root,%{mmgroup}) %{configdir}
 %attr(0644, root, %{mmgroup}) %config(noreplace) %verify(not md5 size mtime) %{configdir}/sitelist.cfg
-%{configdir}/mm_cfg.py
+%{configdir}/mm_cfg.*
 %attr(2775,root,%{mmgroup}) %{lockdir}
 %attr(2775,root,%{mmgroup}) %{logdir}
 %attr(2775,root,%{mmgroup}) %{queuedir}
@@ -510,6 +514,12 @@ exit 0
 %attr(0755,root,root) %{_bindir}/mailman-update-cfg
 
 %changelog
+* Tue Feb 22 2011 Jan Kaluza <jkaluza@redhat.com> 3:2.1.12-14.2
+- fix #677848 - fixed build problem without brew
+
+* Mon Feb 21 2011 Jan Kaluza <jkaluza@redhat.com> 3:2.1.12-14.1
+- fix #677848 - fixed CVE-2010-3089 and CVE-2011-0707
+
 * Mon Jun 21 2010 Jan Kaluza <jkaluza@redhat.com> 3:2.1.12-14
 - fix #606311 - better RedirectMatch for default httpd-mailman.conf
 
